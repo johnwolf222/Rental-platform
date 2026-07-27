@@ -6,6 +6,7 @@ import {
   useState,
   type WheelEvent,
 } from 'react'
+import { useNavigate } from 'react-router'
 import '../App.css'
 
 type IconName =
@@ -320,6 +321,8 @@ function Icon({
 }
 
 function HomePage() {
+  const navigate = useNavigate()
+
   const [activeHeroIndex, setActiveHeroIndex] = useState(2)
   const [favorites, setFavorites] = useState<Set<number>>(
     () => new Set([2]),
@@ -523,7 +526,7 @@ function HomePage() {
             <button
               type="button"
               className="desktop-nav__link"
-              onClick={() => scrollToSection('member-deal')}
+              onClick={() => navigate('/notifications')}
             >
               Notifications
               <span className="notification-dot">2</span>
@@ -531,14 +534,14 @@ function HomePage() {
             <button
               type="button"
               className="desktop-nav__link"
-              onClick={() => scrollToSection('featured-listings')}
+              onClick={() => navigate('/favorites')}
             >
               Favorites
             </button>
             <button
               type="button"
               className="desktop-nav__link"
-              onClick={() => scrollToSection('contact')}
+              onClick={() => navigate('/contact')}
             >
               Contact
             </button>
@@ -549,7 +552,7 @@ function HomePage() {
               type="button"
               className="notification-button"
               aria-label="Open notifications"
-              onClick={() => scrollToSection('member-deal')}
+              onClick={() => navigate('/notifications')}
             >
               <Icon name="bell" />
               <span>2</span>
@@ -559,6 +562,7 @@ function HomePage() {
               type="button"
               className="profile-chip"
               aria-label="Open member profile"
+              onClick={() => navigate('/profile')}
             >
               <span className="profile-chip__image">JW</span>
               <span className="profile-chip__copy">
@@ -616,7 +620,14 @@ function HomePage() {
                   type="button"
                   className={`hero-panel ${isActive ? 'is-active' : ''}`}
                   key={property.id}
-                  onClick={() => setActiveHeroIndex(index)}
+                  onClick={() => {
+                    if (isActive) {
+                      navigate(`/properties/${property.id}`)
+                      return
+                    }
+
+                    setActiveHeroIndex(index)
+                  }}
                   onMouseEnter={() => scheduleHeroPreview(index)}
                   onMouseLeave={cancelHeroPreview}
                   onFocus={() => setActiveHeroIndex(index)}
@@ -727,7 +738,11 @@ function HomePage() {
             </p>
           </div>
 
-          <button type="button" className="outline-button">
+          <button
+            type="button"
+            className="outline-button"
+            onClick={() => navigate('/profile')}
+          >
             View rewards
             <Icon name="arrow" size={17} />
           </button>
@@ -1004,7 +1019,12 @@ function HomePage() {
                           <span> / night</span>
                         </p>
 
-                        <button type="button">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            navigate(`/properties/${property.id}`)
+                          }
+                        >
                           View details
                           <Icon name="arrow" size={16} />
                         </button>
@@ -1067,7 +1087,10 @@ function HomePage() {
             </p>
           </div>
 
-          <button type="button">
+          <button
+            type="button"
+            onClick={() => navigate('/contact')}
+          >
             Contact management
             <Icon name="arrow" size={18} />
           </button>
@@ -1086,7 +1109,7 @@ function HomePage() {
 
         <button
           type="button"
-          onClick={() => scrollToSection('member-deal')}
+          onClick={() => navigate('/notifications')}
         >
           <span className="mobile-nav__icon">
             <Icon name="bell" />
@@ -1097,7 +1120,7 @@ function HomePage() {
 
         <button
           type="button"
-          onClick={() => scrollToSection('featured-listings')}
+          onClick={() => navigate('/favorites')}
         >
           <Icon name="heart" />
           <span>Favorites</span>
@@ -1105,13 +1128,16 @@ function HomePage() {
 
         <button
           type="button"
-          onClick={() => scrollToSection('contact')}
+          onClick={() => navigate('/contact')}
         >
           <Icon name="contact" />
           <span>Contact</span>
         </button>
 
-        <button type="button">
+        <button
+          type="button"
+          onClick={() => navigate('/profile')}
+        >
           <Icon name="profile" />
           <span>Profile</span>
         </button>
