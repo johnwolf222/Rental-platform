@@ -332,6 +332,7 @@ function App() {
   )
 
   const wheelLocked = useRef(false)
+  const heroHoverTimer = useRef<number | null>(null)
 
   useEffect(() => {
     document.title = 'Rental Platform — Member Stays & Rewards'
@@ -382,6 +383,28 @@ function App() {
       return nextIndex
     })
   }, [])
+
+  const scheduleHeroPreview = (index: number) => {
+    if (index === activeHeroIndex) {
+      return
+    }
+
+    if (heroHoverTimer.current !== null) {
+      window.clearTimeout(heroHoverTimer.current)
+    }
+
+    heroHoverTimer.current = window.setTimeout(() => {
+      setActiveHeroIndex(index)
+      heroHoverTimer.current = null
+    }, 180)
+  }
+
+  const cancelHeroPreview = () => {
+    if (heroHoverTimer.current !== null) {
+      window.clearTimeout(heroHoverTimer.current)
+      heroHoverTimer.current = null
+    }
+  }
 
   const handleHeroWheel = (event: WheelEvent<HTMLDivElement>) => {
     if (wheelLocked.current || Math.abs(event.deltaY) < 12) {
@@ -571,16 +594,15 @@ function App() {
                   className={`hero-panel ${isActive ? 'is-active' : ''}`}
                   key={property.id}
                   onClick={() => setActiveHeroIndex(index)}
+                  onMouseEnter={() => scheduleHeroPreview(index)}
+                  onMouseLeave={cancelHeroPreview}
+                  onFocus={() => setActiveHeroIndex(index)}
                   aria-pressed={isActive}
                   aria-label={`Feature ${property.title}`}
                 >
                   <img src={property.image} alt={property.title} />
 
                   <span className="hero-panel__shade" />
-
-                  <span className="hero-panel__number">
-                    {String(index + 1).padStart(2, '0')}
-                  </span>
 
                   <span className="hero-panel__partial-label">
                     {property.city}
@@ -620,10 +642,10 @@ function App() {
           </div>
 
           <div className="hero-gallery__footer">
-            <div className="hero-gallery__progress">
-              <span>
-                {String(activeHeroIndex + 1).padStart(2, '0')}
-              </span>
+            <div
+              className="hero-gallery__progress"
+              aria-label={`Featured property ${activeHeroIndex + 1} of ${properties.length}`}
+            >
               <div>
                 <i
                   style={{
@@ -633,7 +655,6 @@ function App() {
                   }}
                 />
               </div>
-              <span>{String(properties.length).padStart(2, '0')}</span>
             </div>
 
             <p>
