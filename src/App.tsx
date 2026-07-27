@@ -206,13 +206,13 @@ const properties: Property[] = [
   },
 ]
 
-const categoryOptions = [
-  { name: 'Beach House', symbol: '☀' },
-  { name: 'Cabin', symbol: '⌂' },
-  { name: 'Estate', symbol: '♜' },
-  { name: 'Apartment', symbol: '▦' },
-  { name: 'Loft', symbol: '◇' },
-  { name: 'Waterfront', symbol: '≈' },
+const propertyTypeOptions = [
+  'Beach House',
+  'Cabin',
+  'Estate',
+  'Apartment',
+  'Loft',
+  'Waterfront',
 ]
 
 function Icon({
@@ -358,6 +358,28 @@ function App() {
     ).sort()
   }, [filters.state])
 
+  const stateOptions = useMemo(() => {
+    return availableStates
+      .map((state) => {
+        const stateProperties = properties.filter(
+          (property) => property.state === state,
+        )
+
+        return {
+          name: state,
+          propertyCount: stateProperties.length,
+          cities: Array.from(
+            new Set(stateProperties.map((property) => property.city)),
+          ).sort(),
+        }
+      })
+      .sort(
+        (firstState, secondState) =>
+          secondState.propertyCount - firstState.propertyCount ||
+          firstState.name.localeCompare(secondState.name),
+      )
+  }, [availableStates])
+
   const filteredProperties = useMemo(() => {
     return properties.filter((property) => {
       const stateMatches =
@@ -443,10 +465,11 @@ function App() {
     }, 50)
   }
 
-  const applyCategory = (category: string) => {
+  const applyState = (state: string) => {
     const nextFilters = {
       ...filters,
-      type: category,
+      state,
+      city: '',
     }
 
     setFilters(nextFilters)
@@ -780,9 +803,9 @@ function App() {
                 }
               >
                 <option value="">All property types</option>
-                {categoryOptions.map((category) => (
-                  <option value={category.name} key={category.name}>
-                    {category.name}
+                {propertyTypeOptions.map((propertyType) => (
+                  <option value={propertyType} key={propertyType}>
+                    {propertyType}
                   </option>
                 ))}
               </select>
@@ -806,22 +829,52 @@ function App() {
             </button>
           </div>
 
-          <div className="category-grid" aria-label="Property categories">
-            {categoryOptions.map((category, index) => (
+          <div className="state-browser-heading">
+            <div>
+              <span>Browse by state</span>
+              <p>
+                Only states with active manager-approved rentals appear here.
+              </p>
+            </div>
+
+            {appliedFilters.state && (
+              <button type="button" onClick={resetSearch}>
+                View all states
+              </button>
+            )}
+          </div>
+
+          <div className="state-grid" aria-label="Available rental states">
+            {stateOptions.map((stateOption, index) => (
               <button
                 type="button"
-                key={category.name}
-                className={`category-card category-card--${index + 1} ${
-                  appliedFilters.type === category.name ? 'is-selected' : ''
+                key={stateOption.name}
+                className={`state-card state-card--${index + 1} ${
+                  appliedFilters.state === stateOption.name
+                    ? 'is-selected'
+                    : ''
                 }`}
-                onClick={() => applyCategory(category.name)}
+                onClick={() => applyState(stateOption.name)}
               >
-                <span className="category-card__symbol">
-                  {category.symbol}
+                <span className="state-card__symbol">
+                  <Icon name="map" size={19} />
                 </span>
-                <span>
-                  <small>Explore</small>
-                  <strong>{category.name}</strong>
+
+                <span className="state-card__copy">
+                  <small>Available state</small>
+                  <strong>{stateOption.name}</strong>
+                  <span>
+                    {stateOption.propertyCount}{' '}
+                    {stateOption.propertyCount === 1
+                      ? 'property'
+                      : 'properties'}
+                    {' · '}
+                    {stateOption.cities.join(', ')}
+                  </span>
+                </span>
+
+                <span className="state-card__arrow">
+                  <Icon name="arrow" size={17} />
                 </span>
               </button>
             ))}
