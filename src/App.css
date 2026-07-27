@@ -102,8 +102,9 @@
   border-radius: 999px;
   display: inline-grid;
   place-items: center;
-  color: #ffffff;
-  background: var(--deal);
+  color: var(--ink);
+  background: var(--gold);
+  box-shadow: 0 5px 12px rgba(138, 100, 39, 0.22);
   font-size: 0.65rem;
 }
 
@@ -135,10 +136,11 @@
   border-radius: 999px;
   display: grid;
   place-items: center;
-  color: #ffffff;
-  background: var(--deal);
+  color: var(--ink);
+  background: var(--gold);
+  box-shadow: 0 5px 12px rgba(138, 100, 39, 0.22);
   font-size: 0.63rem;
-  font-weight: 800;
+  font-weight: 850;
 }
 
 .profile-chip {
@@ -185,16 +187,21 @@
 
 .member-deal {
   min-height: 58px;
+  border: 1px solid rgba(138, 100, 39, 0.16);
   border-radius: 18px;
   padding: 10px 14px;
   display: flex;
   align-items: center;
   gap: 13px;
-  color: #ffffff;
+  color: var(--ink);
   background:
-    radial-gradient(circle at 85% 20%, rgba(255, 255, 255, 0.17), transparent 20rem),
-    linear-gradient(115deg, #b94f32, #d66c45);
-  box-shadow: 0 18px 40px rgba(163, 75, 49, 0.19);
+    radial-gradient(
+      circle at 85% 20%,
+      rgba(255, 255, 255, 0.36),
+      transparent 20rem
+    ),
+    linear-gradient(115deg, #b98938, #d9b660);
+  box-shadow: 0 18px 40px rgba(138, 100, 39, 0.22);
 }
 
 .member-deal__icon {
@@ -215,10 +222,11 @@
 }
 
 .member-deal__copy span {
+  border: 1px solid rgba(20, 35, 31, 0.09);
   border-radius: 999px;
   padding: 5px 8px;
-  color: #7e2f1e;
-  background: #fff3e8;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.72);
   font-size: 0.66rem;
   font-weight: 850;
   letter-spacing: 0.08em;
@@ -235,10 +243,10 @@
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  color: #ffffff;
+  color: var(--ink);
   background: transparent;
   font-size: 0.78rem;
-  font-weight: 800;
+  font-weight: 850;
 }
 
 .hero-section {
@@ -806,15 +814,17 @@
 }
 
 .state-card--2 .state-card__symbol {
-  background: #315d8a;
+  color: var(--ink);
+  background: var(--gold);
 }
 
 .state-card--3 .state-card__symbol {
-  background: #984c35;
+  background: #3d7466;
 }
 
 .state-card--4 .state-card__symbol {
-  background: #8b6b43;
+  color: #ffffff;
+  background: var(--gold-deep);
 }
 
 .state-card__copy {
@@ -960,7 +970,7 @@
 }
 
 .favorite-button.is-favorite {
-  color: #c44d49;
+  color: var(--gold-deep);
 }
 
 .property-card__thumbnails {
@@ -1734,8 +1744,9 @@
     border-radius: 999px;
     display: grid;
     place-items: center;
-    color: #ffffff;
-    background: var(--deal);
+    color: var(--ink);
+    background: var(--gold);
+    box-shadow: 0 5px 12px rgba(138, 100, 39, 0.28);
     font-size: 0.52rem;
     font-style: normal;
     font-weight: 850;

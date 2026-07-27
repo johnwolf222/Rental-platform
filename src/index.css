@@ -5,8 +5,10 @@
   --muted: #687570;
   --accent: #255d50;
   --accent-soft: #dce9e4;
-  --deal: #c65a3c;
-  --gold: #d7a85b;
+  --deal: #c99a45;
+  --gold: #c99a45;
+  --gold-deep: #8a6427;
+  --gold-soft: #f5ead3;
   --display: Georgia, 'Times New Roman', serif;
   --sans: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI',
     sans-serif;
