@@ -13,6 +13,7 @@ import {
   getPropertyById,
   properties,
 } from '../data/properties'
+import { saveBookingIntent } from '../lib/bookingIntent'
 import './PropertyPage.css'
 
 type DetailIconName =
@@ -648,7 +649,22 @@ function PropertyPage() {
               type="button"
               className="property-booking__primary"
               disabled={nights === 0}
-              onClick={() => navigate('/login')}
+              onClick={() => {
+                saveBookingIntent({
+                  propertyId: property.id,
+                  propertyTitle: property.title,
+                  checkIn,
+                  checkOut,
+                  guests: guestCount,
+                  nights,
+                  nightlyRate: property.price,
+                  subtotal,
+                  pointsPerNight: property.pointsPerNight,
+                  expectedPoints,
+                })
+
+                navigate('/booking/review')
+              }}
             >
               Continue to secure booking
               <DetailIcon name="arrow" size={17} />
