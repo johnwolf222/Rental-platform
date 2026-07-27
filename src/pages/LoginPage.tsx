@@ -69,6 +69,7 @@ function LoginPage() {
       description="Return to your private rental account, saved properties, rewards, notifications, and pending booking details."
       backLabel="Create an account"
       backTo="/signup"
+      compact
     >
       <div className="access-grid">
         <section className="access-card">

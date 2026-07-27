@@ -9,6 +9,7 @@ type PlatformPageProps = {
   children?: ReactNode
   backLabel?: string
   backTo?: string
+  compact?: boolean
 }
 
 function PlatformPage({
@@ -18,16 +19,24 @@ function PlatformPage({
   children,
   backLabel = 'Return to rental search',
   backTo = '/',
+  compact = false,
 }: PlatformPageProps) {
   return (
-    <main className="platform-page">
+    <main
+      className={`platform-page ${
+        compact ? 'platform-page--compact' : ''
+      }`}
+    >
       <header className="platform-page__header">
         <Link
           className="platform-page__brand"
           to="/"
           aria-label="Return to the rental platform homepage"
         >
-          <span className="platform-page__brand-mark" aria-hidden="true">
+          <span
+            className="platform-page__brand-mark"
+            aria-hidden="true"
+          >
             <svg
               width="20"
               height="20"
@@ -49,8 +58,12 @@ function PlatformPage({
           </span>
         </Link>
 
-        <Link className="platform-page__back-link" to={backTo}>
+        <Link
+          className="platform-page__back-link"
+          to={backTo}
+        >
           {backLabel}
+
           <svg
             width="17"
             height="17"
@@ -70,19 +83,27 @@ function PlatformPage({
 
       <section className="platform-page__hero">
         <div className="platform-page__hero-copy">
-          <span className="platform-page__eyebrow">{eyebrow}</span>
+          <span className="platform-page__eyebrow">
+            {eyebrow}
+          </span>
+
           <h1>{title}</h1>
           <p>{description}</p>
         </div>
 
-        <div className="platform-page__seal" aria-hidden="true">
+        <div
+          className="platform-page__seal"
+          aria-hidden="true"
+        >
           <span>Member</span>
           <strong>Access</strong>
         </div>
       </section>
 
       {children && (
-        <section className="platform-page__content">{children}</section>
+        <section className="platform-page__content">
+          {children}
+        </section>
       )}
     </main>
   )

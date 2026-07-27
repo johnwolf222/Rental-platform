@@ -9,6 +9,7 @@ import {
   useNavigate,
 } from 'react-router'
 import PlatformPage from '../components/layout/PlatformPage'
+import LegalAgreementModal from '../components/legal/LegalAgreementModal'
 import { useAuth } from '../context/AuthContext'
 import {
   MEMBERSHIP_TERMS,
@@ -43,6 +44,8 @@ function SignupPage() {
   const [privacyViewedAt, setPrivacyViewedAt] =
     useState('')
   const [error, setError] = useState('')
+  const [legalModalOpen, setLegalModalOpen] =
+    useState(false)
 
   const destination =
     (location.state as ReturnState | null)?.from?.pathname ??
@@ -107,6 +110,7 @@ function SignupPage() {
       description="Create your private member profile, review the current legal documents, and record your agreement before entering the platform."
       backLabel="Already a member?"
       backTo="/login"
+      compact
     >
       <div className="access-grid">
         <section className="access-card">
@@ -178,7 +182,7 @@ function SignupPage() {
               />
             </label>
 
-            <div className="access-form__row">
+            <div className="access-form__row access-password-row">
               <label className="access-field">
                 <span>Password</span>
                 <input
@@ -210,80 +214,57 @@ function SignupPage() {
                   minLength={8}
                   required
                 />
+                <small>
+                  Must match the password.
+                </small>
               </label>
             </div>
 
             <section className="access-review">
               <div className="access-review__heading">
-                <strong>Review required documents</strong>
+                <strong>
+                  Terms and Privacy
+                </strong>
+
                 <span>
                   {documentsReviewed
-                    ? 'Review recorded'
-                    : 'Action required'}
+                    ? 'Review complete'
+                    : 'Review required'}
                 </span>
               </div>
 
               <p>
-                Open both documents before the agreement
-                checkbox becomes available.
+                Read both required documents inside one
+                floating card without leaving this page.
               </p>
 
-              <div className="access-review__links">
-                <Link
-                  to="/terms"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={
-                    termsViewedAt ? 'is-reviewed' : ''
-                  }
-                  onClick={() =>
-                    setTermsViewedAt(
-                      new Date().toISOString(),
-                    )
-                  }
-                >
-                  {termsViewedAt
-                    ? 'Terms reviewed ✓'
-                    : 'Review Terms and Conditions'}
-                </Link>
+              <button
+                type="button"
+                className={`access-review__button ${
+                  documentsReviewed
+                    ? 'is-reviewed'
+                    : ''
+                }`}
+                onClick={() =>
+                  setLegalModalOpen(true)
+                }
+              >
+                {documentsReviewed
+                  ? 'Read again — review recorded ✓'
+                  : 'Read Terms & Privacy'}
+              </button>
 
-                <Link
-                  to="/privacy"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={
-                    privacyViewedAt ? 'is-reviewed' : ''
-                  }
-                  onClick={() =>
-                    setPrivacyViewedAt(
-                      new Date().toISOString(),
-                    )
-                  }
-                >
-                  {privacyViewedAt
-                    ? 'Privacy reviewed ✓'
-                    : 'Review Privacy Policy'}
-                </Link>
-              </div>
-
-              <p>
+              <p className="access-review__versions">
                 Terms version: {MEMBERSHIP_TERMS.version}
                 <br />
                 Privacy version: {PRIVACY_POLICY.version}
               </p>
             </section>
 
-            <label
-              className={`access-consent ${
-                documentsReviewed
-                  ? ''
-                  : 'is-disabled'
-              }`}
-            >
+            <label className="access-consent">
               <input
                 type="checkbox"
                 checked={termsAccepted}
-                disabled={!documentsReviewed}
                 onChange={(event) =>
                   setTermsAccepted(
                     event.target.checked,
@@ -296,16 +277,9 @@ function SignupPage() {
                 <strong>
                   Required membership agreement.
                 </strong>{' '}
-                I have reviewed, read, and agree to
-                the{' '}
-                <Link to="/terms" target="_blank">
-                  Terms and Conditions
-                </Link>{' '}
-                and acknowledge the{' '}
-                <Link to="/privacy" target="_blank">
-                  Privacy Policy
-                </Link>
-                .
+                I agree to the current Terms and
+                Conditions and acknowledge the Privacy
+                Policy.
               </span>
             </label>
 
@@ -400,6 +374,19 @@ function SignupPage() {
           </div>
         </aside>
       </div>
+
+      <LegalAgreementModal
+        open={legalModalOpen}
+        onClose={() => setLegalModalOpen(false)}
+        onReviewed={() => {
+          const reviewedAt =
+            new Date().toISOString()
+
+          setTermsViewedAt(reviewedAt)
+          setPrivacyViewedAt(reviewedAt)
+          setLegalModalOpen(false)
+        }}
+      />
     </PlatformPage>
   )
 }
