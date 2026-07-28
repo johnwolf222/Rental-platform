@@ -15,6 +15,7 @@ type PlatformPageProps = {
   backTo?: string
   compact?: boolean
   memberNavigation?: boolean
+  heroImage?: string
 }
 
 type MemberIconName =
@@ -179,6 +180,7 @@ function PlatformPage({
   backTo = '/',
   compact = false,
   memberNavigation = false,
+  heroImage,
 }: PlatformPageProps) {
   const pageClassName = [
     'platform-page',
@@ -248,7 +250,22 @@ function PlatformPage({
         </Link>
       </header>
 
-      <section className="platform-page__hero">
+      <section
+        className={`platform-page__hero ${
+          heroImage
+            ? 'platform-page__hero--visual'
+            : ''
+        }`}
+      >
+        {heroImage && (
+          <img
+            className="platform-page__hero-image"
+            src={heroImage}
+            alt=""
+            aria-hidden="true"
+          />
+        )}
+
         <div className="platform-page__hero-copy">
           <span className="platform-page__eyebrow">
             {eyebrow}

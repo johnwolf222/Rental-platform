@@ -4,6 +4,7 @@ import {
 } from 'react-router'
 import PlatformPage from '../components/layout/PlatformPage'
 import { useAuth } from '../context/AuthContext'
+import { properties } from '../data/properties'
 import './ProfilePage.css'
 import './ProfileDashboardExperience.css'
 
@@ -13,6 +14,15 @@ const memberDateFormatter = new Intl.DateTimeFormat(
     month: 'long',
     day: 'numeric',
     year: 'numeric',
+  },
+)
+
+const currencyFormatter = new Intl.NumberFormat(
+  'en-US',
+  {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 0,
   },
 )
 
@@ -28,6 +38,41 @@ function ProfilePage() {
     return null
   }
 
+  const heroProperty =
+    properties[3] ?? properties[0]
+
+  if (!heroProperty) {
+    return null
+  }
+
+  const featuredProperty =
+    properties[5] ?? heroProperty
+
+  const rewardBackdrop =
+    properties[1] ?? heroProperty
+
+  const recommendedProperties =
+    properties.slice(0, 3)
+
+  const recentlyViewedProperties =
+    properties.slice(3, 6)
+
+  const firstRewardProgress = Math.min(
+    Math.round(
+      (CURRENT_POINTS / FIRST_REWARD_POINTS) *
+        100,
+    ),
+    100,
+  )
+
+  const secondRewardProgress = Math.min(
+    Math.round(
+      (CURRENT_POINTS / SECOND_REWARD_POINTS) *
+        100,
+    ),
+    100,
+  )
+
   const handleLogout = () => {
     signOut()
 
@@ -39,9 +84,10 @@ function ProfilePage() {
   return (
     <PlatformPage
       memberNavigation
+      heroImage={heroProperty.image}
       eyebrow="Private member account"
       title="Profile & Rewards"
-      description="Track reward progress, review saved stays and booking activity, and manage your private member account from one secure workspace."
+      description="Your private home for personalized rentals, saved inspiration, booking activity, and member rewards."
     >
       <section className="profile-session-card">
         <div className="profile-session-card__identity">
@@ -64,6 +110,7 @@ function ProfilePage() {
         <div className="profile-session-card__details">
           <span>
             <small>Member since</small>
+
             <strong>
               {memberDateFormatter.format(
                 new Date(user.createdAt),
@@ -77,9 +124,10 @@ function ProfilePage() {
           </span>
 
           <span>
-            <small>Terms accepted</small>
+            <small>Reward balance</small>
             <strong>
-              {user.legalAcceptance.termsVersion}
+              {CURRENT_POINTS.toLocaleString('en-US')}{' '}
+              points
             </strong>
           </span>
         </div>
@@ -105,289 +153,321 @@ function ProfilePage() {
             <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
           </svg>
 
-          Log out
+          <span>Log out</span>
         </button>
       </section>
 
       <section
-        className="profile-dashboard"
-        aria-label="Member rewards and account dashboard"
+        className="profile-visual-dashboard"
+        aria-label="Personalized rental dashboard"
       >
-        <article className="profile-rewards-card">
-          <header className="profile-rewards-card__header">
+        <article className="profile-escape-banner">
+          <img
+            src={featuredProperty.image}
+            alt={featuredProperty.title}
+          />
+
+          <div className="profile-escape-banner__shade" />
+
+          <div className="profile-escape-banner__content">
+            <span>
+              Your next escape
+            </span>
+
+            <h2>
+              No reservation yet.
+              <strong>
+                Start somewhere unforgettable.
+              </strong>
+            </h2>
+
+            <p>
+              {featuredProperty.title} offers{' '}
+              {featuredProperty.beds} bedrooms,{' '}
+              {featuredProperty.baths} baths, and room
+              for {featuredProperty.guests} guests.
+            </p>
+
+            <div className="profile-escape-banner__actions">
+              <Link
+                to={`/properties/${featuredProperty.id}`}
+              >
+                Explore this property
+                <span aria-hidden="true">→</span>
+              </Link>
+
+              <Link to="/">
+                Browse all rentals
+              </Link>
+            </div>
+          </div>
+
+          <aside className="profile-escape-banner__facts">
+            <span>
+              <small>Nightly rate</small>
+              <strong>
+                {currencyFormatter.format(
+                  featuredProperty.price,
+                )}
+              </strong>
+            </span>
+
+            <span>
+              <small>Guest rating</small>
+              <strong>
+                ★ {featuredProperty.rating}
+              </strong>
+            </span>
+
+            <span>
+              <small>Member rewards</small>
+              <strong>
+                +{featuredProperty.pointsPerNight}
+              </strong>
+            </span>
+          </aside>
+        </article>
+
+        <section className="profile-property-showcase">
+          <header className="profile-section-heading">
             <div>
-              <span>Rewards balance</span>
-              <h2>Your next free night is getting closer.</h2>
+              <span>Selected for your account</span>
+
+              <h2>
+                Rentals worth opening twice.
+              </h2>
             </div>
 
-            <span className="profile-rewards-card__status">
-              Active rewards
-            </span>
+            <Link to="/">
+              Explore every property
+              <span aria-hidden="true">→</span>
+            </Link>
           </header>
 
-          <div className="profile-rewards-card__balance">
-            <div>
-              <strong>
-                {CURRENT_POINTS.toLocaleString('en-US')}
-              </strong>
+          <div className="profile-property-grid">
+            {recommendedProperties.map(
+              (property) => (
+                <article
+                  className="profile-property-card"
+                  key={property.id}
+                >
+                  <div className="profile-property-card__image">
+                    <img
+                      src={property.image}
+                      alt={property.title}
+                    />
 
-              <span>available points</span>
+                    <span className="profile-property-card__label">
+                      {property.label}
+                    </span>
+
+                    <span className="profile-property-card__favorite">
+                      ♡
+                    </span>
+
+                    <span className="profile-property-card__points">
+                      +{property.pointsPerNight} pts/night
+                    </span>
+                  </div>
+
+                  <div className="profile-property-card__body">
+                    <div className="profile-property-card__location">
+                      <span>
+                        {property.city}, {property.state}
+                      </span>
+
+                      <strong>
+                        ★ {property.rating}
+                      </strong>
+                    </div>
+
+                    <h3>{property.title}</h3>
+
+                    <div className="profile-property-card__details">
+                      <span>{property.beds} beds</span>
+                      <span>{property.baths} baths</span>
+                      <span>
+                        {property.guests} guests
+                      </span>
+                    </div>
+
+                    <footer>
+                      <p>
+                        <strong>
+                          {currencyFormatter.format(
+                            property.price,
+                          )}
+                        </strong>
+
+                        <span> / night</span>
+                      </p>
+
+                      <Link
+                        to={`/properties/${property.id}`}
+                      >
+                        View stay
+                        <span aria-hidden="true">→</span>
+                      </Link>
+                    </footer>
+                  </div>
+                </article>
+              ),
+            )}
+          </div>
+        </section>
+
+        <section className="profile-reward-journey">
+          <img
+            className="profile-reward-journey__backdrop"
+            src={rewardBackdrop.image}
+            alt=""
+            aria-hidden="true"
+          />
+
+          <div className="profile-reward-journey__shade" />
+
+          <header className="profile-reward-journey__header">
+            <div>
+              <span>Member reward journey</span>
+
+              <h2>
+                {CURRENT_POINTS.toLocaleString('en-US')}
+                <small> available points</small>
+              </h2>
             </div>
 
             <Link to="/booking/review">
               Review booking
               <span aria-hidden="true">→</span>
             </Link>
-          </div>
+          </header>
 
-          <div className="profile-reward-list">
-            <article className="profile-reward">
-              <div className="profile-reward__heading">
-                <div>
-                  <span>1,400-Point Reward</span>
-                  <h3>
-                    Book 2 Nights, Get the 3rd Night FREE
-                  </h3>
-                </div>
-
-                <strong>
-                  {Math.min(
-                    Math.round(
-                      (CURRENT_POINTS /
-                        FIRST_REWARD_POINTS) *
-                        100,
-                    ),
-                    100,
-                  )}
-                  %
-                </strong>
+          <div className="profile-reward-milestones">
+            <article>
+              <div>
+                <span>1,400-Point Reward</span>
+                <strong>{firstRewardProgress}%</strong>
               </div>
 
+              <h3>
+                Book 2 Nights, Get the 3rd Night FREE
+              </h3>
+
               <p>
-                Book two nights and enjoy your third night
-                free. Redeem 1,400 points.
+                Book two nights and enjoy your third
+                night free. Redeem 1,400 points.
               </p>
 
-              <div
-                className="profile-reward__meter"
-                role="progressbar"
-                aria-label="Progress toward the 1,400-point reward"
-                aria-valuemin={0}
-                aria-valuemax={FIRST_REWARD_POINTS}
-                aria-valuenow={CURRENT_POINTS}
-              >
+              <div className="profile-reward-meter">
                 <span
                   style={{
-                    width: `${Math.min(
-                      (CURRENT_POINTS /
-                        FIRST_REWARD_POINTS) *
-                        100,
-                      100,
-                    )}%`,
+                    width: `${firstRewardProgress}%`,
                   }}
                 />
               </div>
 
               <footer>
                 <span>
-                  {CURRENT_POINTS.toLocaleString('en-US')} earned
+                  {CURRENT_POINTS.toLocaleString('en-US')}{' '}
+                  earned
                 </span>
 
                 <strong>
-                  {Math.max(
-                    FIRST_REWARD_POINTS - CURRENT_POINTS,
-                    0,
+                  {(
+                    FIRST_REWARD_POINTS -
+                    CURRENT_POINTS
                   ).toLocaleString('en-US')}{' '}
-                  points remaining
+                  remaining
                 </strong>
               </footer>
             </article>
 
-            <article className="profile-reward">
-              <div className="profile-reward__heading">
-                <div>
-                  <span>2,800-Point Reward</span>
-                  <h3>
-                    Book 1 Night, Get the 2nd Night FREE
-                  </h3>
-                </div>
-
-                <strong>
-                  {Math.min(
-                    Math.round(
-                      (CURRENT_POINTS /
-                        SECOND_REWARD_POINTS) *
-                        100,
-                    ),
-                    100,
-                  )}
-                  %
-                </strong>
+            <article>
+              <div>
+                <span>2,800-Point Reward</span>
+                <strong>{secondRewardProgress}%</strong>
               </div>
 
+              <h3>
+                Book 1 Night, Get the 2nd Night FREE
+              </h3>
+
               <p>
-                Book one night and enjoy your second night
-                free. Redeem 2,800 points.
+                Book one night and enjoy your second
+                night free. Redeem 2,800 points.
               </p>
 
-              <div
-                className="profile-reward__meter"
-                role="progressbar"
-                aria-label="Progress toward the 2,800-point reward"
-                aria-valuemin={0}
-                aria-valuemax={SECOND_REWARD_POINTS}
-                aria-valuenow={CURRENT_POINTS}
-              >
+              <div className="profile-reward-meter">
                 <span
                   style={{
-                    width: `${Math.min(
-                      (CURRENT_POINTS /
-                        SECOND_REWARD_POINTS) *
-                        100,
-                      100,
-                    )}%`,
+                    width: `${secondRewardProgress}%`,
                   }}
                 />
               </div>
 
               <footer>
                 <span>
-                  {CURRENT_POINTS.toLocaleString('en-US')} earned
+                  {CURRENT_POINTS.toLocaleString('en-US')}{' '}
+                  earned
                 </span>
 
                 <strong>
-                  {Math.max(
-                    SECOND_REWARD_POINTS - CURRENT_POINTS,
-                    0,
+                  {(
+                    SECOND_REWARD_POINTS -
+                    CURRENT_POINTS
                   ).toLocaleString('en-US')}{' '}
-                  points remaining
+                  remaining
                 </strong>
               </footer>
             </article>
           </div>
-        </article>
+        </section>
 
-        <aside className="profile-dashboard__side">
-          <article className="profile-status-card">
-            <span className="profile-status-card__eyebrow">
-              Next stay
-            </span>
-
-            <div className="profile-status-card__icon">
-              <span aria-hidden="true">⌂</span>
+        <section className="profile-recent-section">
+          <header className="profile-section-heading">
+            <div>
+              <span>Recently viewed</span>
+              <h2>Keep exploring.</h2>
             </div>
-
-            <h3>No upcoming reservation</h3>
-
-            <p>
-              Explore manager-approved rentals and preserve
-              your nightly rate and reward value when you
-              begin booking.
-            </p>
-
-            <Link to="/">
-              Explore rentals
-              <span aria-hidden="true">→</span>
-            </Link>
-          </article>
-
-          <article className="profile-status-card profile-status-card--gold">
-            <span className="profile-status-card__eyebrow">
-              Saved stays
-            </span>
-
-            <div className="profile-status-card__icon">
-              <span aria-hidden="true">♡</span>
-            </div>
-
-            <h3>Your favorites, organized.</h3>
-
-            <p>
-              Return to properties you have saved and compare
-              locations, nightly prices, ratings, and reward
-              values.
-            </p>
 
             <Link to="/favorites">
               Open favorites
               <span aria-hidden="true">→</span>
             </Link>
-          </article>
-        </aside>
-
-        <section className="profile-tools">
-          <header className="profile-tools__heading">
-            <div>
-              <span>Account shortcuts</span>
-              <h2>Everything important, one tap away.</h2>
-            </div>
-
-            <p>
-              Review account activity, saved stays, pending
-              booking details, messages, and support.
-            </p>
           </header>
 
-          <div className="profile-tools__grid">
-            <Link to="/notifications">
-              <span className="profile-tools__number">02</span>
+          <div className="profile-recent-grid">
+            {recentlyViewedProperties.map(
+              (property) => (
+                <Link
+                  to={`/properties/${property.id}`}
+                  className="profile-recent-card"
+                  key={property.id}
+                >
+                  <img
+                    src={property.image}
+                    alt={property.title}
+                  />
 
-              <div>
-                <small>Member activity</small>
-                <strong>Notifications</strong>
-                <p>
-                  Review booking updates, reward milestones,
-                  and manager messages.
-                </p>
-              </div>
+                  <span className="profile-recent-card__shade" />
 
-              <i aria-hidden="true">→</i>
-            </Link>
+                  <div>
+                    <small>
+                      {property.city}, {property.state}
+                    </small>
 
-            <Link to="/booking/review">
-              <span className="profile-tools__number">01</span>
+                    <strong>{property.title}</strong>
 
-              <div>
-                <small>Reservation progress</small>
-                <strong>Booking review</strong>
-                <p>
-                  Return to preserved dates, guests, rates,
-                  and expected rewards.
-                </p>
-              </div>
-
-              <i aria-hidden="true">→</i>
-            </Link>
-
-            <Link to="/favorites">
-              <span className="profile-tools__number">♡</span>
-
-              <div>
-                <small>Your collection</small>
-                <strong>Favorite properties</strong>
-                <p>
-                  Revisit saved properties and continue
-                  comparing stays.
-                </p>
-              </div>
-
-              <i aria-hidden="true">→</i>
-            </Link>
-
-            <Link to="/contact">
-              <span className="profile-tools__number">?</span>
-
-              <div>
-                <small>Member assistance</small>
-                <strong>Contact management</strong>
-                <p>
-                  Ask about properties, bookings,
-                  accessibility, rewards, or your account.
-                </p>
-              </div>
-
-              <i aria-hidden="true">→</i>
-            </Link>
+                    <span>
+                      {currencyFormatter.format(
+                        property.price,
+                      )}{' '}
+                      / night
+                    </span>
+                  </div>
+                </Link>
+              ),
+            )}
           </div>
         </section>
       </section>
