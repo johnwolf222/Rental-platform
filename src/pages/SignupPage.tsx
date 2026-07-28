@@ -15,6 +15,7 @@ import {
   MEMBERSHIP_TERMS,
   PRIVACY_POLICY,
 } from '../data/legal'
+import { beginWelcomeFlow } from '../lib/welcomeFlow'
 import './AccessPage.css'
 
 type ReturnState = {
@@ -100,7 +101,11 @@ function SignupPage() {
       return
     }
 
-    navigate(destination, { replace: true })
+    beginWelcomeFlow(destination)
+
+    navigate('/welcome', {
+      replace: true,
+    })
   }
 
   return (

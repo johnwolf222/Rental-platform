@@ -16,6 +16,7 @@ import ProfilePage from './pages/ProfilePage'
 import PropertyPage from './pages/PropertyPage'
 import SignupPage from './pages/SignupPage'
 import TermsPage from './pages/TermsPage'
+import WelcomePage from './pages/WelcomePage'
 
 function App() {
   return (
@@ -35,6 +36,10 @@ function App() {
       <Route path="privacy" element={<PrivacyPage />} />
 
       <Route element={<ProtectedRoute />}>
+        <Route
+          path="welcome"
+          element={<WelcomePage />}
+        />
         <Route
           path="notifications"
           element={<NotificationsPage />}
