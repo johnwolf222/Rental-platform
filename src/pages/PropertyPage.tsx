@@ -15,6 +15,7 @@ import {
 } from '../data/properties'
 import { saveBookingIntent } from '../lib/bookingIntent'
 import './PropertyPage.css'
+import './PropertyAppExperience.css'
 
 type DetailIconName =
   | 'arrow'
@@ -542,7 +543,10 @@ function PropertyPage() {
             </section>
           </article>
 
-          <aside className="property-booking">
+          <aside
+            className="property-booking"
+            id="property-booking"
+          >
             <div className="property-booking__price">
               <div>
                 <strong>{currencyFormatter.format(property.price)}</strong>
@@ -748,6 +752,34 @@ function PropertyPage() {
           </div>
         </section>
       </main>
+
+      <aside
+        className="property-mobile-booking-bar"
+        aria-label="Mobile booking controls"
+      >
+        <div>
+          <small>From</small>
+          <strong>
+            {currencyFormatter.format(property.price)}
+            <span> / night</span>
+          </strong>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => {
+            document
+              .getElementById('property-booking')
+              ?.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center',
+              })
+          }}
+        >
+          Choose dates
+          <DetailIcon name="calendar" size={17} />
+        </button>
+      </aside>
     </div>
   )
 }
