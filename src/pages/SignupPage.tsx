@@ -15,11 +15,6 @@ import {
   MEMBERSHIP_TERMS,
   PRIVACY_POLICY,
 } from '../data/legal'
-import {
-  beginWelcomeFlow,
-  completeWelcomeFlow,
-  hasPendingWelcome,
-} from '../lib/welcomeFlow'
 import './AccessPage.css'
 
 type ReturnState = {
@@ -54,7 +49,7 @@ function SignupPage() {
 
   const destination =
     (location.state as ReturnState | null)?.from?.pathname ??
-    '/profile'
+    '/'
 
   const documentsReviewed =
     Boolean(termsViewedAt) &&
@@ -71,16 +66,7 @@ function SignupPage() {
     termsAccepted
 
   if (user) {
-    return (
-      <Navigate
-        to={
-          hasPendingWelcome()
-            ? '/welcome'
-            : destination
-        }
-        replace
-      />
-    )
+    return <Navigate to={destination} replace />
   }
 
   const handleSubmit = (
@@ -96,8 +82,6 @@ function SignupPage() {
       return
     }
 
-    beginWelcomeFlow(destination)
-
     const result = signUp({
       firstName,
       lastName,
@@ -109,8 +93,6 @@ function SignupPage() {
     })
 
     if (!result.success) {
-      completeWelcomeFlow()
-
       setError(
         result.error ??
           'The account could not be created.',
@@ -118,7 +100,7 @@ function SignupPage() {
       return
     }
 
-    navigate('/welcome', {
+    navigate(destination, {
       replace: true,
     })
   }
