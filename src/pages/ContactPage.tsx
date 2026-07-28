@@ -4,6 +4,7 @@ import PlatformPlaceholder from '../components/layout/PlatformPlaceholder'
 function ContactPage() {
   return (
     <PlatformPage
+      memberNavigation
       eyebrow="Member assistance"
       title="Contact Management"
       description="Members will be able to ask about bookings, individual properties, accessibility, payments, rewards, and account support."

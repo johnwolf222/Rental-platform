@@ -31,6 +31,7 @@ function ProfilePage() {
 
   return (
     <PlatformPage
+      memberNavigation
       eyebrow="Private member account"
       title="Profile & Rewards"
       description="Profile editing, reward progress, previous stays, saved properties, recent views, payment methods, notification preferences, and security settings will live here."

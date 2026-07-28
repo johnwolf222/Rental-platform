@@ -45,6 +45,7 @@ function BookingReviewPage() {
 
   return (
     <PlatformPage
+      memberNavigation
       eyebrow="Protected booking step"
       title="Booking Review"
       description="Review the property, dates, guests, price snapshot, and reward value preserved before member authentication."

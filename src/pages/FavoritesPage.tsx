@@ -4,6 +4,7 @@ import PlatformPlaceholder from '../components/layout/PlatformPlaceholder'
 function FavoritesPage() {
   return (
     <PlatformPage
+      memberNavigation
       eyebrow="Saved by you"
       title="Favorite Properties"
       description="Every property a member likes will be available here for quick comparison, availability checks, reward values, and future booking."

@@ -4,6 +4,7 @@ import PlatformPlaceholder from '../components/layout/PlatformPlaceholder'
 function NotificationsPage() {
   return (
     <PlatformPage
+      memberNavigation
       eyebrow="Member updates"
       title="Notifications"
       description="Booking updates, newly posted deals, reward milestones, review requests, and manager messages will be organized here."
