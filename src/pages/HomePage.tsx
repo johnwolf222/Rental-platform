@@ -12,6 +12,7 @@ import {
   propertyTypeOptions,
 } from '../data/properties'
 import '../App.css'
+import './HomeAppExperience.css'
 
 type IconName =
   | 'search'
