@@ -11,6 +11,7 @@ import {
   properties,
   propertyTypeOptions,
 } from '../data/properties'
+import { usePersistentFavorites } from '../lib/favorites'
 import '../App.css'
 import './HomeAppExperience.css'
 
@@ -147,9 +148,10 @@ function HomePage() {
   const navigate = useNavigate()
 
   const [activeHeroIndex, setActiveHeroIndex] = useState(2)
-  const [favorites, setFavorites] = useState<Set<number>>(
-    () => new Set([2]),
-  )
+  const {
+    favorites,
+    toggleFavorite,
+  } = usePersistentFavorites()
   const [filters, setFilters] = useState<Filters>(emptyFilters)
   const [appliedFilters, setAppliedFilters] =
     useState<Filters>(emptyFilters)
@@ -265,20 +267,6 @@ function HomePage() {
     window.setTimeout(() => {
       wheelLocked.current = false
     }, 650)
-  }
-
-  const toggleFavorite = (propertyId: number) => {
-    setFavorites((currentFavorites) => {
-      const nextFavorites = new Set(currentFavorites)
-
-      if (nextFavorites.has(propertyId)) {
-        nextFavorites.delete(propertyId)
-      } else {
-        nextFavorites.add(propertyId)
-      }
-
-      return nextFavorites
-    })
   }
 
   const applySearch = () => {

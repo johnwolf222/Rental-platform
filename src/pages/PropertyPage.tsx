@@ -14,6 +14,7 @@ import {
   properties,
 } from '../data/properties'
 import { saveBookingIntent } from '../lib/bookingIntent'
+import { usePersistentFavorites } from '../lib/favorites'
 import './PropertyPage.css'
 import './PropertyAppExperience.css'
 
@@ -209,14 +210,16 @@ function PropertyPage() {
   const property = getPropertyById(propertyId)
 
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
-  const [saved, setSaved] = useState(false)
+  const {
+    favorites,
+    toggleFavorite,
+  } = usePersistentFavorites()
   const [checkIn, setCheckIn] = useState('')
   const [checkOut, setCheckOut] = useState('')
   const [guestCount, setGuestCount] = useState(1)
 
   useEffect(() => {
     setSelectedImageIndex(0)
-    setSaved(false)
     setCheckIn('')
     setCheckOut('')
     setGuestCount(1)
@@ -252,6 +255,10 @@ function PropertyPage() {
   const expectedPoints = property
     ? property.pointsPerNight * nights
     : 0
+
+  const saved = property
+    ? favorites.has(property.id)
+    : false
 
   if (!property) {
     return (
@@ -321,7 +328,7 @@ function PropertyPage() {
           <button
             type="button"
             className={`property-save ${saved ? 'is-saved' : ''}`}
-            onClick={() => setSaved((current) => !current)}
+            onClick={() => toggleFavorite(property.id)}
             aria-pressed={saved}
           >
             <DetailIcon
