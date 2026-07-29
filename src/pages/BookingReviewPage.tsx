@@ -2,7 +2,10 @@ import {
   useMemo,
   useState,
 } from 'react'
-import { Link } from 'react-router'
+import {
+  Link,
+  useNavigate,
+} from 'react-router'
 import PlatformPage from '../components/layout/PlatformPage'
 import { useAuth } from '../context/AuthContext'
 import { getPropertyById } from '../data/properties'
@@ -14,7 +17,6 @@ import {
   createReservation,
   type ReservationPaymentMethod,
   type ReservationPaymentPlan,
-  type ReservationRecord,
 } from '../lib/reservations'
 import './StayConfirmationExperience.css'
 
@@ -113,6 +115,7 @@ function PaymentIcon({
 
 function BookingReviewPage() {
   const { user } = useAuth()
+  const navigate = useNavigate()
 
   const [intent] = useState(() =>
     getBookingIntent(),
@@ -121,6 +124,8 @@ function BookingReviewPage() {
   const property = intent
     ? getPropertyById(intent.propertyId)
     : undefined
+
+  const heroImage = property?.image
 
   const [checkIn, setCheckIn] = useState(
     intent?.checkIn ?? '',
@@ -151,14 +156,6 @@ function BookingReviewPage() {
     acceptedConfirmation,
     setAcceptedConfirmation,
   ] = useState(false)
-
-  const [
-    confirmedReservation,
-    setConfirmedReservation,
-  ] =
-    useState<ReservationRecord | null>(
-      null,
-    )
 
   const nights = calculateNights(
     checkIn,
@@ -278,133 +275,14 @@ function BookingReviewPage() {
     })
 
     clearBookingIntent()
-    setConfirmedReservation(reservation)
 
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth',
-    })
-  }
-
-  if (confirmedReservation) {
-    const confirmedProperty =
-      getPropertyById(
-        confirmedReservation.propertyId,
-      )
-
-    return (
-      <PlatformPage
-        memberNavigation
-        heroImage={confirmedProperty?.image}
-        eyebrow="Reservation secured"
-        title="Stay Confirmed"
-        description="Your home away from home is now recorded in your member account."
-        backLabel="Return to rentals"
-        backTo="/"
-      >
-        <section className="stay-success">
-          {confirmedProperty && (
-            <img
-              className="stay-success__image"
-              src={confirmedProperty.image}
-              alt={confirmedProperty.title}
-            />
-          )}
-
-          <div className="stay-success__shade" />
-
-          <div className="stay-success__content">
-            <span className="stay-success__eyebrow">
-              Confirmation complete
-            </span>
-
-            <h2>
-              Welcome home,
-              <strong>
-                {user?.firstName}.
-              </strong>
-            </h2>
-
-            <p>
-              Your stay at{' '}
-              {confirmedReservation.propertyTitle}{' '}
-              has been recorded. Your confirmation
-              number and investment schedule are shown
-              below.
-            </p>
-
-            <div className="stay-success__confirmation">
-              <span>
-                <small>Confirmation number</small>
-                <strong>
-                  {confirmedReservation.id}
-                </strong>
-              </span>
-
-              <span>
-                <small>Arrival</small>
-                <strong>
-                  {formatDate(
-                    confirmedReservation.checkIn,
-                  )}
-                </strong>
-              </span>
-
-              <span>
-                <small>Departure</small>
-                <strong>
-                  {formatDate(
-                    confirmedReservation.checkOut,
-                  )}
-                </strong>
-              </span>
-
-              <span>
-                <small>Due today</small>
-                <strong>
-                  {currencyFormatter.format(
-                    confirmedReservation.dueToday,
-                  )}
-                </strong>
-              </span>
-            </div>
-
-            <div className="stay-success__notice">
-              <strong>
-                Your Welcome Home portal is ready
-              </strong>
-
-              <p>
-                Open your private stay portal for the
-                live arrival countdown, manager
-                reminders, complimentary-item details,
-                and owner communication. The address,
-                map, directions, entry instructions,
-                and emergency information remain
-                protected until check-in begins.
-              </p>
-            </div>
-
-            <div className="stay-success__actions">
-              <Link
-                to={`/stays/${confirmedReservation.id}`}
-              >
-                Open Welcome Home
-                <span aria-hidden="true">→</span>
-              </Link>
-
-              <Link to="/">
-                Explore another stay
-              </Link>
-            </div>
-          </div>
-        </section>
-      </PlatformPage>
+    navigate(
+      `/stays/${reservation.id}`,
+      {
+        replace: true,
+      },
     )
   }
-
-  const heroImage =
-    property?.image
 
   return (
     <PlatformPage

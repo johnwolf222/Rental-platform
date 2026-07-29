@@ -234,6 +234,23 @@ function ReservationPortalPage() {
 
   const { user } = useAuth()
 
+  useEffect(() => {
+    document.body.classList.add(
+      'reservation-portal-page-active',
+    )
+
+    window.scrollTo({
+      top: 0,
+      behavior: 'auto',
+    })
+
+    return () => {
+      document.body.classList.remove(
+        'reservation-portal-page-active',
+      )
+    }
+  }, [])
+
   const reservation = useMemo(
     () =>
       getReservationById(
@@ -591,6 +608,24 @@ function ReservationPortalPage() {
           />
 
           <div className="reservation-portal__hero-shade" />
+
+          <aside className="reservation-portal__account-status">
+            <span>
+              <i />
+              Secure workspace
+            </span>
+
+            <strong>
+              Account
+              <br />
+              active
+            </strong>
+
+            <small>
+              Reservations, rewards, and account
+              tools are protected.
+            </small>
+          </aside>
 
           <div className="reservation-portal__hero-copy">
             <span>
