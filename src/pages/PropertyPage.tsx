@@ -677,7 +677,7 @@ function PropertyPage() {
                 navigate('/booking/review')
               }}
             >
-              Continue to secure booking
+              Continue to stay confirmation
               <DetailIcon name="arrow" size={17} />
             </button>
 
@@ -690,8 +690,8 @@ function PropertyPage() {
             </button>
 
             <p>
-              No payment is taken on this preview. Final fees, availability,
-              and property terms will appear before confirmation.
+              Your selected dates, guests, nightly rate, and expected rewards
+              will carry into the Stay Confirmation experience.
             </p>
           </aside>
         </section>
