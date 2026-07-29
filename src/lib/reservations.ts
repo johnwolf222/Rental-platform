@@ -105,3 +105,25 @@ export function createReservation(
 export function getReservations() {
   return readReservations()
 }
+
+export function getReservationById(
+  reservationId: string | undefined,
+): ReservationRecord | undefined {
+  if (!reservationId) {
+    return undefined
+  }
+
+  return readReservations().find(
+    (reservation) =>
+      reservation.id === reservationId,
+  )
+}
+
+export function getReservationsForMember(
+  memberId: string,
+): ReservationRecord[] {
+  return readReservations().filter(
+    (reservation) =>
+      reservation.memberId === memberId,
+  )
+}

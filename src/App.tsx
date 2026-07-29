@@ -14,6 +14,7 @@ import NotificationsPage from './pages/NotificationsPage'
 import PrivacyPage from './pages/PrivacyPage'
 import ProfilePage from './pages/ProfilePage'
 import PropertyPage from './pages/PropertyPage'
+import ReservationPortalPage from './pages/ReservationPortalPage'
 import SignupPage from './pages/SignupPage'
 import TermsPage from './pages/TermsPage'
 
@@ -50,6 +51,10 @@ function App() {
         <Route
           path="booking/review"
           element={<BookingReviewPage />}
+        />
+        <Route
+          path="stays/:reservationId"
+          element={<ReservationPortalPage />}
         />
       </Route>
 

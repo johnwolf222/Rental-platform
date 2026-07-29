@@ -1,0 +1,500 @@
+.manager-stay-dashboard {
+  display: grid;
+  gap: 20px;
+}
+
+.manager-stay-overview,
+.manager-settings-panel,
+.manager-chat-panel {
+  border: 1px solid rgba(20, 35, 31, 0.075);
+  border-radius: 30px;
+  overflow: hidden;
+  background: #ffffff;
+  box-shadow:
+    0 20px 55px rgba(20, 35, 31, 0.07),
+    0 4px 13px rgba(20, 35, 31, 0.025);
+}
+
+.manager-stay-overview {
+  position: relative;
+  min-height: 410px;
+  padding: clamp(31px, 5vw, 55px);
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(260px, 0.42fr);
+  align-items: end;
+  gap: 40px;
+  color: #ffffff;
+  isolation: isolate;
+}
+
+.manager-stay-overview > img {
+  position: absolute;
+  z-index: -2;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.manager-stay-overview__shade {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(6, 24, 18, 0.97),
+      rgba(8, 31, 24, 0.79) 52%,
+      rgba(7, 24, 19, 0.34)
+    ),
+    linear-gradient(
+      0deg,
+      rgba(5, 19, 14, 0.72),
+      transparent
+    );
+}
+
+.manager-stay-overview > div > span,
+.manager-settings-panel > header > span,
+.manager-chat-panel > header > span,
+.manager-reminders > header > span {
+  color: #e7bd71;
+  font-size: 0.6rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.manager-stay-overview h2 {
+  max-width: 720px;
+  margin: 15px 0 0;
+  font-family: var(--display);
+  font-size: clamp(3.5rem, 6vw, 6.4rem);
+  font-weight: 500;
+  line-height: 0.86;
+  letter-spacing: -0.06em;
+}
+
+.manager-stay-overview p {
+  max-width: 620px;
+  margin: 20px 0 0;
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 0.72rem;
+  line-height: 1.7;
+}
+
+.manager-stay-overview label {
+  max-width: 620px;
+  margin-top: 24px;
+  display: grid;
+  gap: 7px;
+}
+
+.manager-stay-overview label > span {
+  color: rgba(255, 255, 255, 0.52);
+  font-size: 0.51rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.manager-stay-overview select {
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid rgba(255, 255, 255, 0.19);
+  border-radius: 15px;
+  padding: 0 14px;
+  color: #ffffff;
+  background: rgba(8, 31, 24, 0.72);
+  font: inherit;
+  font-size: 0.68rem;
+  outline: none;
+  backdrop-filter: blur(17px);
+}
+
+.manager-stay-overview > aside {
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 23px;
+  padding: 9px 17px;
+  background: rgba(8, 31, 24, 0.72);
+  backdrop-filter: blur(18px);
+}
+
+.manager-stay-overview > aside > span {
+  padding: 15px 3px;
+  display: block;
+}
+
+.manager-stay-overview
+  > aside
+  > span
+  + span {
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.manager-stay-overview small,
+.manager-stay-overview strong {
+  display: block;
+}
+
+.manager-stay-overview small {
+  color: rgba(255, 255, 255, 0.52);
+  font-size: 0.49rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.manager-stay-overview strong {
+  margin-top: 6px;
+  font-family: var(--display);
+  font-size: 1.45rem;
+  font-weight: 500;
+}
+
+.manager-stay-grid {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(330px, 0.43fr);
+  align-items: start;
+  gap: 20px;
+}
+
+.manager-settings-panel {
+  padding: clamp(27px, 4vw, 45px);
+}
+
+.manager-settings-panel > header > span,
+.manager-chat-panel > header > span,
+.manager-reminders > header > span {
+  color: var(--accent);
+}
+
+.manager-settings-panel > header h2,
+.manager-chat-panel > header h2 {
+  margin: 10px 0 0;
+  font-family: var(--display);
+  font-size: clamp(2.8rem, 4.7vw, 4.9rem);
+  font-weight: 500;
+  line-height: 0.9;
+  letter-spacing: -0.055em;
+}
+
+.manager-settings-panel > header p {
+  max-width: 720px;
+  margin: 15px 0 0;
+  color: var(--muted);
+  font-size: 0.69rem;
+  line-height: 1.7;
+}
+
+.manager-field-grid {
+  margin-top: 27px;
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 11px;
+}
+
+.manager-field-grid label,
+.manager-reminders article > label {
+  display: grid;
+  gap: 7px;
+}
+
+.manager-field-grid__wide {
+  grid-column: 1 / -1;
+}
+
+.manager-field-grid label > span,
+.manager-reminders article
+  > label
+  > span,
+.manager-reservation-select > span,
+.manager-chat-composer label > span {
+  color: var(--muted);
+  font-size: 0.53rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.manager-field-grid input,
+.manager-field-grid select,
+.manager-field-grid textarea,
+.manager-reminders input,
+.manager-reminders textarea,
+.manager-reservation-select select,
+.manager-chat-composer textarea {
+  width: 100%;
+  border: 1px solid rgba(20, 35, 31, 0.1);
+  border-radius: 16px;
+  padding: 12px 14px;
+  color: var(--ink);
+  background: #fafcf9;
+  font: inherit;
+  font-size: 0.68rem;
+  line-height: 1.55;
+  outline: none;
+}
+
+.manager-field-grid input,
+.manager-field-grid select,
+.manager-reminders input,
+.manager-reservation-select select {
+  min-height: 48px;
+}
+
+.manager-field-grid textarea,
+.manager-reminders textarea,
+.manager-chat-composer textarea {
+  resize: vertical;
+}
+
+.manager-field-grid input:focus,
+.manager-field-grid select:focus,
+.manager-field-grid textarea:focus,
+.manager-reminders input:focus,
+.manager-reminders textarea:focus,
+.manager-reservation-select select:focus,
+.manager-chat-composer textarea:focus {
+  border-color: rgba(37, 93, 80, 0.5);
+  box-shadow: 0 0 0 4px rgba(37, 93, 80, 0.075);
+}
+
+.manager-reminders {
+  margin-top: 34px;
+  border-top: 1px solid rgba(20, 35, 31, 0.08);
+  padding-top: 29px;
+}
+
+.manager-reminders > header h3 {
+  margin: 9px 0 0;
+  font-family: var(--display);
+  font-size: 2.5rem;
+  font-weight: 500;
+}
+
+.manager-reminders > article {
+  margin-top: 11px;
+  border: 1px solid rgba(20, 35, 31, 0.08);
+  border-radius: 19px;
+  padding: 17px;
+  display: grid;
+  gap: 13px;
+  background: #fafcf9;
+}
+
+.manager-reminder-toggle {
+  display: flex !important;
+  align-items: center;
+  gap: 9px;
+}
+
+.manager-reminder-toggle input {
+  width: 18px;
+  min-height: auto;
+  height: 18px;
+  accent-color: var(--accent);
+}
+
+.manager-reminder-toggle span {
+  color: var(--accent) !important;
+}
+
+.manager-settings-actions {
+  margin-top: 24px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.manager-settings-actions button,
+.manager-chat-composer button {
+  min-height: 46px;
+  border: 0;
+  border-radius: 999px;
+  padding: 0 17px;
+  color: #ffffff;
+  background: var(--accent);
+  font: inherit;
+  font-size: 0.65rem;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.manager-settings-actions > span {
+  color: var(--accent);
+  font-size: 0.65rem;
+  font-weight: 800;
+}
+
+.manager-chat-panel {
+  position: sticky;
+  top: 92px;
+}
+
+.manager-chat-panel > header {
+  border-bottom: 1px solid rgba(20, 35, 31, 0.08);
+  padding: 25px;
+}
+
+.manager-chat-panel > header h2 {
+  font-size: 3rem;
+}
+
+.manager-reservation-select {
+  padding: 18px;
+  display: grid;
+  gap: 7px;
+}
+
+.manager-reservation-summary {
+  margin: 0 18px 14px;
+  border-radius: 17px;
+  padding: 10px;
+  display: grid;
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+  background: #f4f8f4;
+}
+
+.manager-reservation-summary > span {
+  padding: 9px;
+}
+
+.manager-reservation-summary small,
+.manager-reservation-summary strong {
+  display: block;
+}
+
+.manager-reservation-summary small {
+  color: var(--muted);
+  font-size: 0.48rem;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.manager-reservation-summary strong {
+  margin-top: 5px;
+  font-size: 0.61rem;
+}
+
+.manager-chat-messages {
+  height: 355px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+  background: #f7faf7;
+}
+
+.manager-chat-messages > article {
+  width: min(88%, 390px);
+  border-radius: 17px 17px 17px 5px;
+  padding: 12px 13px;
+  align-self: flex-start;
+  background: #ffffff;
+}
+
+.manager-chat-messages > article.is-manager {
+  border-radius: 17px 17px 5px 17px;
+  align-self: flex-end;
+  color: #ffffff;
+  background: var(--accent);
+}
+
+.manager-chat-messages strong {
+  font-size: 0.55rem;
+}
+
+.manager-chat-messages p {
+  margin: 7px 0 0;
+  color: inherit;
+  font-size: 0.64rem;
+  line-height: 1.55;
+}
+
+.manager-chat-composer {
+  border-top: 1px solid rgba(20, 35, 31, 0.08);
+  padding: 17px;
+  display: grid;
+  gap: 11px;
+}
+
+.manager-chat-composer label {
+  display: grid;
+  gap: 7px;
+}
+
+.manager-chat-composer button:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.manager-chat-empty {
+  padding: 30px;
+  text-align: center;
+}
+
+.manager-chat-empty span {
+  color: var(--accent);
+  font-family: var(--display);
+  font-size: 2rem;
+}
+
+.manager-chat-empty p {
+  margin: 11px 0 0;
+  color: var(--muted);
+  font-size: 0.67rem;
+  line-height: 1.65;
+}
+
+@media (max-width: 1050px) {
+  .manager-stay-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .manager-chat-panel {
+    position: static;
+  }
+}
+
+@media (max-width: 760px) {
+  .manager-stay-overview,
+  .manager-settings-panel,
+  .manager-chat-panel {
+    border-radius: 25px;
+  }
+
+  .manager-stay-overview {
+    min-height: 570px;
+    padding: 29px 20px;
+    grid-template-columns: 1fr;
+  }
+
+  .manager-stay-overview h2 {
+    font-size: clamp(3.5rem, 15vw, 5rem);
+  }
+
+  .manager-field-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .manager-field-grid__wide {
+    grid-column: auto;
+  }
+
+  .manager-settings-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .manager-settings-actions button {
+    width: 100%;
+  }
+}

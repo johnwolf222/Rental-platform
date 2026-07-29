@@ -371,20 +371,25 @@ function BookingReviewPage() {
 
             <div className="stay-success__notice">
               <strong>
-                Reservation confirmed
+                Your Welcome Home portal is ready
               </strong>
 
               <p>
-                Payment authorization remains pending
-                until a live payment processor is
-                connected. No card information has
-                been stored by this platform.
+                Open your private stay portal for the
+                live arrival countdown, manager
+                reminders, complimentary-item details,
+                and owner communication. The address,
+                map, directions, entry instructions,
+                and emergency information remain
+                protected until check-in begins.
               </p>
             </div>
 
             <div className="stay-success__actions">
-              <Link to="/profile">
-                Open member profile
+              <Link
+                to={`/stays/${confirmedReservation.id}`}
+              >
+                Open Welcome Home
                 <span aria-hidden="true">→</span>
               </Link>
 
