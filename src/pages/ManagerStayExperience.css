@@ -498,3 +498,194 @@
     width: 100%;
   }
 }
+
+/* ==================================================
+   MEMBER ACTIVITY AND REWARD OPERATIONS
+   ================================================== */
+
+.manager-member-activity {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.manager-activity-card {
+  border: 1px solid rgba(20, 35, 31, 0.075);
+  border-radius: 30px;
+  padding: clamp(27px, 4vw, 43px);
+  background: #ffffff;
+  box-shadow:
+    0 20px 55px rgba(20, 35, 31, 0.07),
+    0 4px 13px rgba(20, 35, 31, 0.025);
+}
+
+.manager-activity-card header > span {
+  color: var(--accent);
+  font-size: 0.6rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.manager-activity-card header h2 {
+  margin: 10px 0 0;
+  font-family: var(--display);
+  font-size: clamp(2.7rem, 4vw, 4.2rem);
+  font-weight: 500;
+  line-height: 0.9;
+  letter-spacing: -0.055em;
+}
+
+.manager-activity-card header p {
+  max-width: 620px;
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: 0.68rem;
+  line-height: 1.7;
+}
+
+.manager-activity-card form,
+.manager-reward-form {
+  margin-top: 24px;
+  display: grid;
+  gap: 12px;
+}
+
+.manager-activity-card label,
+.manager-reward-form label {
+  display: grid;
+  gap: 7px;
+}
+
+.manager-activity-card label > span,
+.manager-reward-form label > span {
+  color: var(--muted);
+  font-size: 0.53rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.manager-activity-card input,
+.manager-activity-card select,
+.manager-activity-card textarea,
+.manager-reward-form input {
+  width: 100%;
+  border: 1px solid rgba(20, 35, 31, 0.1);
+  border-radius: 16px;
+  padding: 12px 14px;
+  color: var(--ink);
+  background: #fafcf9;
+  font: inherit;
+  font-size: 0.68rem;
+  line-height: 1.55;
+  outline: none;
+}
+
+.manager-activity-card input,
+.manager-activity-card select,
+.manager-reward-form input {
+  min-height: 48px;
+}
+
+.manager-activity-card textarea {
+  resize: vertical;
+}
+
+.manager-activity-card
+  form
+  > button,
+.manager-reward-form
+  > div
+  > button {
+  min-height: 45px;
+  border: 0;
+  border-radius: 999px;
+  padding: 0 17px;
+  color: #ffffff;
+  background: var(--accent);
+  font: inherit;
+  font-size: 0.64rem;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.manager-activity-card form > strong,
+.manager-reward-form > strong {
+  color: var(--accent);
+  font-size: 0.64rem;
+}
+
+.manager-reward-member {
+  margin-top: 24px;
+  border-radius: 18px;
+  padding: 12px;
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  background: #f4f8f4;
+}
+
+.manager-reward-member > span {
+  padding: 10px;
+}
+
+.manager-reward-member small,
+.manager-reward-member strong {
+  display: block;
+}
+
+.manager-reward-member small {
+  color: var(--muted);
+  font-size: 0.49rem;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.manager-reward-member strong {
+  margin-top: 6px;
+  font-size: 0.66rem;
+}
+
+.manager-reward-form > div {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.manager-reward-form
+  > div
+  > button.is-secondary {
+  color: var(--accent);
+  border: 1px solid rgba(37, 93, 80, 0.18);
+  background: #ffffff;
+}
+
+.manager-reward-empty {
+  margin-top: 24px;
+  border-radius: 18px;
+  padding: 22px;
+  color: var(--muted);
+  background: #f4f8f4;
+  font-size: 0.68rem;
+  line-height: 1.6;
+}
+
+@media (max-width: 940px) {
+  .manager-member-activity {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 620px) {
+  .manager-activity-card {
+    border-radius: 25px;
+  }
+
+  .manager-reward-member,
+  .manager-reward-form > div {
+    grid-template-columns: 1fr;
+  }
+}

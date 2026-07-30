@@ -1,4 +1,10 @@
 import {
+  creditRewardPoints,
+  debitRewardPoints,
+  getRewardBalance,
+} from '../lib/rewards'
+import { createNotification } from '../lib/notifications'
+import {
   useEffect,
   useMemo,
   useState,
@@ -117,6 +123,43 @@ function ManagerDashboardPage() {
   const [
     replyMessage,
     setReplyMessage,
+  ] = useState('')
+
+  const [
+    announcementType,
+    setAnnouncementType,
+  ] = useState<'property' | 'deal'>(
+    'property',
+  )
+
+  const [
+    announcementTitle,
+    setAnnouncementTitle,
+  ] = useState('')
+
+  const [
+    announcementMessage,
+    setAnnouncementMessage,
+  ] = useState('')
+
+  const [
+    announcementStatus,
+    setAnnouncementStatus,
+  ] = useState('')
+
+  const [
+    pointAmount,
+    setPointAmount,
+  ] = useState('100')
+
+  const [
+    pointReason,
+    setPointReason,
+  ] = useState('Manager reward adjustment')
+
+  const [
+    pointStatus,
+    setPointStatus,
   ] = useState('')
 
   useEffect(() => {
@@ -247,6 +290,27 @@ function ManagerDashboardPage() {
     setSavedMessage(
       'Stay portal settings saved.',
     )
+
+    const notifiedMemberIds =
+      new Set(
+        reservationsForProperty.map(
+          (reservation) =>
+            reservation.memberId,
+        ),
+      )
+
+    notifiedMemberIds.forEach(
+      (memberId) => {
+        createNotification({
+          memberId,
+          type: 'stay',
+          title: 'Stay information updated',
+          message:
+            `${selectedProperty?.title ?? 'Your property'} has updated arrival information, reminders, or stay instructions.`,
+          link: '/stays',
+        })
+      },
+    )
   }
 
   const handleManagerReply = (
@@ -269,8 +333,145 @@ function ManagerDashboardPage() {
       message: replyMessage,
     })
 
+    createNotification({
+      memberId:
+        selectedReservation.memberId,
+      type: 'message',
+      title: 'New property-manager message',
+      message:
+        `Property management sent a new private message regarding ${selectedReservation.propertyTitle}.`,
+      link:
+        `/stays/${selectedReservation.id}`,
+    })
+
     setReplyMessage('')
   }
+
+  const handlePublishAnnouncement = (
+    event: FormEvent<HTMLFormElement>,
+  ) => {
+    event.preventDefault()
+
+    if (
+      !announcementTitle.trim() ||
+      !announcementMessage.trim()
+    ) {
+      setAnnouncementStatus(
+        'Enter both a title and message.',
+      )
+      return
+    }
+
+    createNotification({
+      memberId: 'all',
+      type: announcementType,
+      title: announcementTitle,
+      message: announcementMessage,
+      link:
+        announcementType === 'property' &&
+        selectedProperty
+          ? `/properties/${selectedProperty.id}`
+          : '/',
+    })
+
+    setAnnouncementStatus(
+      `${
+        announcementType === 'property'
+          ? 'Property'
+          : 'Deal'
+      } update published.`,
+    )
+
+    setAnnouncementTitle('')
+    setAnnouncementMessage('')
+  }
+
+  const handleRewardAdjustment = (
+    direction: 'credit' | 'debit',
+  ) => {
+    if (!selectedReservation) {
+      setPointStatus(
+        'Select a confirmed reservation first.',
+      )
+      return
+    }
+
+    const amount = Number.parseInt(
+      pointAmount,
+      10,
+    )
+
+    if (
+      !Number.isFinite(amount) ||
+      amount <= 0
+    ) {
+      setPointStatus(
+        'Enter a valid point amount.',
+      )
+      return
+    }
+
+    try {
+      const result =
+        direction === 'credit'
+          ? creditRewardPoints({
+              memberId:
+                selectedReservation.memberId,
+              amount,
+              reason: pointReason,
+            })
+          : debitRewardPoints({
+              memberId:
+                selectedReservation.memberId,
+              amount,
+              reason: pointReason,
+            })
+
+      createNotification({
+        memberId:
+          selectedReservation.memberId,
+        type: 'reward',
+        title:
+          direction === 'credit'
+            ? 'Reward points added'
+            : 'Reward points used',
+        message:
+          `${amount.toLocaleString(
+            'en-US',
+          )} points were ${
+            direction === 'credit'
+              ? 'added to'
+              : 'used from'
+          } your reward account. Your available balance is ${result.balance.toLocaleString(
+            'en-US',
+          )} points.`,
+        link: '/profile',
+      })
+
+      setPointStatus(
+        `${amount.toLocaleString(
+          'en-US',
+        )} points ${
+          direction === 'credit'
+            ? 'added'
+            : 'used'
+        }.`,
+      )
+    } catch (error) {
+      setPointStatus(
+        error instanceof Error
+          ? error.message
+          : 'The reward adjustment could not be completed.',
+      )
+    }
+  }
+
+  const selectedMemberBalance =
+    selectedReservation
+      ? getRewardBalance(
+          selectedReservation.memberId,
+        )
+      : 0
 
   return (
     <PlatformPage
@@ -869,6 +1070,210 @@ function ManagerDashboardPage() {
             )}
           </aside>
         </div>
+
+        <section className="manager-member-activity">
+          <article className="manager-activity-card">
+            <header>
+              <span>
+                Member announcement publisher
+              </span>
+
+              <h2>
+                Publish a property or deal update.
+              </h2>
+
+              <p>
+                The announcement appears instantly
+                in every member’s notification
+                center and unread bell count.
+              </p>
+            </header>
+
+            <form
+              onSubmit={
+                handlePublishAnnouncement
+              }
+            >
+              <label>
+                <span>Update type</span>
+
+                <select
+                  value={announcementType}
+                  onChange={(event) =>
+                    setAnnouncementType(
+                      event.target.value as
+                        | 'property'
+                        | 'deal',
+                    )
+                  }
+                >
+                  <option value="property">
+                    New property
+                  </option>
+
+                  <option value="deal">
+                    New member deal
+                  </option>
+                </select>
+              </label>
+
+              <label>
+                <span>Notification title</span>
+
+                <input
+                  value={announcementTitle}
+                  onChange={(event) =>
+                    setAnnouncementTitle(
+                      event.target.value,
+                    )
+                  }
+                  placeholder="Example: New Atlanta property available"
+                />
+              </label>
+
+              <label>
+                <span>Member update</span>
+
+                <textarea
+                  value={announcementMessage}
+                  onChange={(event) =>
+                    setAnnouncementMessage(
+                      event.target.value,
+                    )
+                  }
+                  placeholder="Describe the new property, offer, dates, or deal."
+                  rows={5}
+                />
+              </label>
+
+              <button type="submit">
+                Publish member update
+              </button>
+
+              {announcementStatus && (
+                <strong>
+                  {announcementStatus}
+                </strong>
+              )}
+            </form>
+          </article>
+
+          <article className="manager-activity-card">
+            <header>
+              <span>
+                Member reward controls
+              </span>
+
+              <h2>
+                Add or use reward points.
+              </h2>
+
+              <p>
+                Every adjustment creates a permanent
+                reward transaction and an immediate
+                member notification.
+              </p>
+            </header>
+
+            {selectedReservation ? (
+              <>
+                <div className="manager-reward-member">
+                  <span>
+                    <small>
+                      Selected confirmation
+                    </small>
+
+                    <strong>
+                      {selectedReservation.id}
+                    </strong>
+                  </span>
+
+                  <span>
+                    <small>
+                      Current balance
+                    </small>
+
+                    <strong>
+                      {selectedMemberBalance.toLocaleString(
+                        'en-US',
+                      )}{' '}
+                      points
+                    </strong>
+                  </span>
+                </div>
+
+                <div className="manager-reward-form">
+                  <label>
+                    <span>Point amount</span>
+
+                    <input
+                      type="number"
+                      min="1"
+                      step="1"
+                      value={pointAmount}
+                      onChange={(event) =>
+                        setPointAmount(
+                          event.target.value,
+                        )
+                      }
+                    />
+                  </label>
+
+                  <label>
+                    <span>
+                      Adjustment reason
+                    </span>
+
+                    <input
+                      value={pointReason}
+                      onChange={(event) =>
+                        setPointReason(
+                          event.target.value,
+                        )
+                      }
+                    />
+                  </label>
+
+                  <div>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleRewardAdjustment(
+                          'credit',
+                        )
+                      }
+                    >
+                      Add points
+                    </button>
+
+                    <button
+                      type="button"
+                      className="is-secondary"
+                      onClick={() =>
+                        handleRewardAdjustment(
+                          'debit',
+                        )
+                      }
+                    >
+                      Use points
+                    </button>
+                  </div>
+
+                  {pointStatus && (
+                    <strong>
+                      {pointStatus}
+                    </strong>
+                  )}
+                </div>
+              </>
+            ) : (
+              <div className="manager-reward-empty">
+                Select a property with a confirmed
+                reservation to manage member points.
+              </div>
+            )}
+          </article>
+        </section>
       </section>
     </PlatformPage>
   )

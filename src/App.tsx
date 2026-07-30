@@ -1,3 +1,4 @@
+import MyStaysPage from './pages/MyStaysPage'
 import {
   Route,
   Routes,
@@ -51,6 +52,10 @@ function App() {
         <Route
           path="booking/review"
           element={<BookingReviewPage />}
+        />
+        <Route
+          path="stays"
+          element={<MyStaysPage />}
         />
         <Route
           path="stays/:reservationId"

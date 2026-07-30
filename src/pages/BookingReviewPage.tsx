@@ -1,3 +1,5 @@
+import { creditRewardPoints } from '../lib/rewards'
+import { createNotification } from '../lib/notifications'
 import {
   useMemo,
   useState,
@@ -273,6 +275,46 @@ function BookingReviewPage() {
       expectedPoints:
         financials.expectedPoints,
     })
+
+    const rewardResult =
+      creditRewardPoints({
+        memberId: user.id,
+        amount:
+          reservation.expectedPoints,
+        reason:
+          `Confirmed stay at ${property.title}`,
+        sourceKey:
+          `reservation-reward:${reservation.id}`,
+      })
+
+    createNotification({
+      memberId: user.id,
+      type: 'booking',
+      title: 'Reservation confirmed',
+      message:
+        `${property.title} is confirmed from ${checkIn} through ${checkOut}. Your Welcome Home portal is ready.`,
+      link:
+        `/stays/${reservation.id}`,
+      dedupeKey:
+        `reservation-confirmed:${reservation.id}`,
+    })
+
+    if (rewardResult.created) {
+      createNotification({
+        memberId: user.id,
+        type: 'reward',
+        title: 'Reward points added',
+        message:
+          `${rewardResult.transaction.amount.toLocaleString(
+            'en-US',
+          )} points were added for your confirmed stay. Your new balance is ${rewardResult.balance.toLocaleString(
+            'en-US',
+          )} points.`,
+        link: '/profile',
+        dedupeKey:
+          `reservation-points:${reservation.id}`,
+      })
+    }
 
     clearBookingIntent()
 

@@ -1,4 +1,9 @@
 import {
+  getRewardBalance,
+  REWARDS_UPDATED_EVENT,
+} from '../lib/rewards'
+import { useEffect, useState } from 'react'
+import {
   Link,
   useNavigate,
 } from 'react-router'
@@ -26,13 +31,76 @@ const currencyFormatter = new Intl.NumberFormat(
   },
 )
 
-const CURRENT_POINTS = 1_120
 const FIRST_REWARD_POINTS = 1_400
 const SECOND_REWARD_POINTS = 2_800
 
 function ProfilePage() {
   const navigate = useNavigate()
   const { user, signOut } = useAuth()
+
+  const [
+    currentPoints,
+    setCurrentPoints,
+  ] = useState(
+    () =>
+      user
+        ? getRewardBalance(user.id)
+        : 0,
+  )
+
+  useEffect(() => {
+    if (!user) {
+      setCurrentPoints(0)
+      return
+    }
+
+    const refreshPoints = (
+      event?: Event,
+    ) => {
+      const detail = event
+        ? (
+            event as CustomEvent<{
+              memberId?: string
+            }>
+          ).detail
+        : undefined
+
+      if (
+        detail?.memberId &&
+        detail.memberId !== user.id
+      ) {
+        return
+      }
+
+      setCurrentPoints(
+        getRewardBalance(user.id),
+      )
+    }
+
+    refreshPoints()
+
+    window.addEventListener(
+      REWARDS_UPDATED_EVENT,
+      refreshPoints,
+    )
+
+    window.addEventListener(
+      'storage',
+      refreshPoints,
+    )
+
+    return () => {
+      window.removeEventListener(
+        REWARDS_UPDATED_EVENT,
+        refreshPoints,
+      )
+
+      window.removeEventListener(
+        'storage',
+        refreshPoints,
+      )
+    }
+  }, [user])
 
   if (!user) {
     return null
@@ -59,7 +127,7 @@ function ProfilePage() {
 
   const firstRewardProgress = Math.min(
     Math.round(
-      (CURRENT_POINTS / FIRST_REWARD_POINTS) *
+      (currentPoints / FIRST_REWARD_POINTS) *
         100,
     ),
     100,
@@ -67,7 +135,7 @@ function ProfilePage() {
 
   const secondRewardProgress = Math.min(
     Math.round(
-      (CURRENT_POINTS / SECOND_REWARD_POINTS) *
+      (currentPoints / SECOND_REWARD_POINTS) *
         100,
     ),
     100,
@@ -126,7 +194,7 @@ function ProfilePage() {
           <span>
             <small>Reward balance</small>
             <strong>
-              {CURRENT_POINTS.toLocaleString('en-US')}{' '}
+              {currentPoints.toLocaleString('en-US')}{' '}
               points
             </strong>
           </span>
@@ -331,13 +399,13 @@ function ProfilePage() {
               <span>Member reward journey</span>
 
               <h2>
-                {CURRENT_POINTS.toLocaleString('en-US')}
+                {currentPoints.toLocaleString('en-US')}
                 <small> available points</small>
               </h2>
             </div>
 
-            <Link to="/booking/review">
-              Review booking
+            <Link to="/stays">
+              Open My Stays
               <span aria-hidden="true">→</span>
             </Link>
           </header>
@@ -368,14 +436,15 @@ function ProfilePage() {
 
               <footer>
                 <span>
-                  {CURRENT_POINTS.toLocaleString('en-US')}{' '}
+                  {currentPoints.toLocaleString('en-US')}{' '}
                   earned
                 </span>
 
                 <strong>
-                  {(
+                  {Math.max(
                     FIRST_REWARD_POINTS -
-                    CURRENT_POINTS
+                      currentPoints,
+                    0,
                   ).toLocaleString('en-US')}{' '}
                   remaining
                 </strong>
@@ -407,14 +476,15 @@ function ProfilePage() {
 
               <footer>
                 <span>
-                  {CURRENT_POINTS.toLocaleString('en-US')}{' '}
+                  {currentPoints.toLocaleString('en-US')}{' '}
                   earned
                 </span>
 
                 <strong>
-                  {(
+                  {Math.max(
                     SECOND_REWARD_POINTS -
-                    CURRENT_POINTS
+                      currentPoints,
+                    0,
                   ).toLocaleString('en-US')}{' '}
                   remaining
                 </strong>

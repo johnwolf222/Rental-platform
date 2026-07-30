@@ -1,3 +1,4 @@
+import NotificationBadge from '../components/notifications/NotificationBadge'
 import {
   useCallback,
   useEffect,
@@ -337,14 +338,6 @@ function HomePage() {
             <button
               type="button"
               className="desktop-nav__link"
-              onClick={() => navigate('/notifications')}
-            >
-              Notifications
-              <span className="notification-dot">2</span>
-            </button>
-            <button
-              type="button"
-              className="desktop-nav__link"
               onClick={() => navigate('/favorites')}
             >
               Favorites
@@ -366,7 +359,7 @@ function HomePage() {
               onClick={() => navigate('/notifications')}
             >
               <Icon name="bell" />
-              <span>2</span>
+              <NotificationBadge />
             </button>
 
             <button
@@ -924,7 +917,7 @@ function HomePage() {
         >
           <span className="mobile-nav__icon">
             <Icon name="bell" />
-            <i>2</i>
+            <NotificationBadge as="i" />
           </span>
           <span>Alerts</span>
         </button>

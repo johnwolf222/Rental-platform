@@ -662,3 +662,21 @@
     transition: none;
   }
 }
+
+/* ==================================================
+   LIVE NOTIFICATION ICON
+   ================================================== */
+
+.member-app-nav--desktop
+  a[href="/notifications"] {
+  width: 39px;
+  min-width: 39px;
+  padding-inline: 0;
+  justify-content: center;
+}
+
+.member-app-nav--desktop
+  a[href="/notifications"]
+  .member-app-nav__icon {
+  margin: 0;
+}

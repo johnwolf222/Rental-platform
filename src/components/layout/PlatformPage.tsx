@@ -1,3 +1,4 @@
+import NotificationBadge from '../notifications/NotificationBadge'
 import type { ReactNode } from 'react'
 import {
   Link,
@@ -52,9 +53,9 @@ const memberNavigationItems: MemberNavigationItem[] = [
     icon: 'bell',
   },
   {
-    to: '/booking/review',
-    label: 'Booking',
-    mobileLabel: 'Booking',
+    to: '/stays',
+    label: 'My Stays',
+    mobileLabel: 'Stays',
     icon: 'calendar',
   },
   {
@@ -150,6 +151,17 @@ function MemberNavigation({
           to={item.to}
           end={item.to === '/'}
           key={item.to}
+          aria-label={
+            item.to === '/notifications'
+              ? 'Notifications'
+              : undefined
+          }
+          title={
+            !mobile &&
+            item.to === '/notifications'
+              ? 'Notifications'
+              : undefined
+          }
           className={({ isActive }) =>
             isActive ? 'is-active' : undefined
           }
@@ -158,13 +170,18 @@ function MemberNavigation({
             <MemberIcon name={item.icon} />
 
             {item.to === '/notifications' && (
-              <i aria-label="2 unread notifications">2</i>
+              <NotificationBadge as="i" />
             )}
           </span>
 
-          <span>
-            {mobile ? item.mobileLabel : item.label}
-          </span>
+          {(mobile ||
+            item.to !== '/notifications') && (
+            <span>
+              {mobile
+                ? item.mobileLabel
+                : item.label}
+            </span>
+          )}
         </NavLink>
       ))}
     </nav>
