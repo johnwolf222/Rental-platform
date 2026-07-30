@@ -219,6 +219,8 @@ function PropertyPage() {
   const [guestCount, setGuestCount] = useState(1)
 
   useEffect(() => {
+    // Reset property-specific gallery and booking state after route changes.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSelectedImageIndex(0)
     setCheckIn('')
     setCheckOut('')

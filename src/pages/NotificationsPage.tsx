@@ -188,19 +188,10 @@ function NotificationsPage() {
 
   useEffect(() => {
     if (!user) {
-      setNotifications([])
       return
     }
 
     const refreshNotifications = () => {
-      const rewardBalance =
-        getRewardBalance(user.id)
-
-      ensureMemberNotificationSeed(
-        user.id,
-        rewardBalance,
-      )
-
       setNotifications(
         getNotificationsForMember(
           user.id,
@@ -208,24 +199,38 @@ function NotificationsPage() {
       )
     }
 
-    refreshNotifications()
+    const initializeNotifications = () => {
+      ensureMemberNotificationSeed(
+        user.id,
+        getRewardBalance(user.id),
+      )
 
-    window.addEventListener(
-      NOTIFICATIONS_UPDATED_EVENT,
-      refreshNotifications,
-    )
+      refreshNotifications()
 
-    window.addEventListener(
-      REWARDS_UPDATED_EVENT,
-      refreshNotifications,
-    )
+      window.addEventListener(
+        NOTIFICATIONS_UPDATED_EVENT,
+        refreshNotifications,
+      )
 
-    window.addEventListener(
-      'storage',
-      refreshNotifications,
-    )
+      window.addEventListener(
+        REWARDS_UPDATED_EVENT,
+        refreshNotifications,
+      )
+
+      window.addEventListener(
+        'storage',
+        refreshNotifications,
+      )
+    }
+
+    const frame =
+      window.requestAnimationFrame(
+        initializeNotifications,
+      )
 
     return () => {
+      window.cancelAnimationFrame(frame)
+
       window.removeEventListener(
         NOTIFICATIONS_UPDATED_EVENT,
         refreshNotifications,

@@ -358,7 +358,7 @@ function LegalAgreementModal({
             </span>
           </div>
 
-          <button
+          <button aria-label="Close legal agreement"
             type="button"
             disabled={!bothDocumentsRead}
             onClick={onReviewed}

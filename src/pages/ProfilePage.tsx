@@ -50,7 +50,6 @@ function ProfilePage() {
 
   useEffect(() => {
     if (!user) {
-      setCurrentPoints(0)
       return
     }
 
@@ -77,7 +76,10 @@ function ProfilePage() {
       )
     }
 
-    refreshPoints()
+    const frame =
+      window.requestAnimationFrame(
+        () => refreshPoints(),
+      )
 
     window.addEventListener(
       REWARDS_UPDATED_EVENT,
@@ -90,6 +92,8 @@ function ProfilePage() {
     )
 
     return () => {
+      window.cancelAnimationFrame(frame)
+
       window.removeEventListener(
         REWARDS_UPDATED_EVENT,
         refreshPoints,

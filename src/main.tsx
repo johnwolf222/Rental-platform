@@ -13,6 +13,7 @@ if (!rootElement) {
   )
 }
 
+import './ProfessionalUI.css'
 createRoot(rootElement).render(
   <StrictMode>
     <BrowserRouter>

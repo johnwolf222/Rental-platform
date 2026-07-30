@@ -24,26 +24,22 @@ function NotificationBadge({
 }: NotificationBadgeProps) {
   const { user } = useAuth()
 
-  const [
-    unreadCount,
-    setUnreadCount,
-  ] = useState(0)
+  const [unreadCount, setUnreadCount] =
+    useState(
+      () =>
+        user
+          ? getUnreadNotificationCount(
+              user.id,
+            )
+          : 0,
+    )
 
   useEffect(() => {
     if (!user) {
-      setUnreadCount(0)
       return
     }
 
     const refreshCount = () => {
-      const rewardBalance =
-        getRewardBalance(user.id)
-
-      ensureMemberNotificationSeed(
-        user.id,
-        rewardBalance,
-      )
-
       setUnreadCount(
         getUnreadNotificationCount(
           user.id,
@@ -51,24 +47,38 @@ function NotificationBadge({
       )
     }
 
-    refreshCount()
+    const initializeBadge = () => {
+      ensureMemberNotificationSeed(
+        user.id,
+        getRewardBalance(user.id),
+      )
 
-    window.addEventListener(
-      NOTIFICATIONS_UPDATED_EVENT,
-      refreshCount,
-    )
+      refreshCount()
 
-    window.addEventListener(
-      REWARDS_UPDATED_EVENT,
-      refreshCount,
-    )
+      window.addEventListener(
+        NOTIFICATIONS_UPDATED_EVENT,
+        refreshCount,
+      )
 
-    window.addEventListener(
-      'storage',
-      refreshCount,
-    )
+      window.addEventListener(
+        REWARDS_UPDATED_EVENT,
+        refreshCount,
+      )
+
+      window.addEventListener(
+        'storage',
+        refreshCount,
+      )
+    }
+
+    const frame =
+      window.requestAnimationFrame(
+        initializeBadge,
+      )
 
     return () => {
+      window.cancelAnimationFrame(frame)
+
       window.removeEventListener(
         NOTIFICATIONS_UPDATED_EVENT,
         refreshCount,
@@ -90,28 +100,10 @@ function NotificationBadge({
     return null
   }
 
-  const visibleCount =
-    unreadCount > 99
-      ? '99+'
-      : String(unreadCount)
-
-  if (as === 'i') {
-    return (
-      <i
-        className={className}
-        aria-label={`${unreadCount} unread ${
-          unreadCount === 1
-            ? 'notification'
-            : 'notifications'
-        }`}
-      >
-        {visibleCount}
-      </i>
-    )
-  }
+  const Tag = as
 
   return (
-    <span
+    <Tag
       className={className}
       aria-label={`${unreadCount} unread ${
         unreadCount === 1
@@ -119,8 +111,10 @@ function NotificationBadge({
           : 'notifications'
       }`}
     >
-      {visibleCount}
-    </span>
+      {unreadCount > 99
+        ? '99+'
+        : unreadCount}
+    </Tag>
   )
 }
 

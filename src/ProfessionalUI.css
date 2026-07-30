@@ -1,0 +1,916 @@
+/*
+  Clean professional application layer.
+  The locked homepage accordion hero is intentionally not targeted.
+*/
+
+.platform-page {
+  --ui-border: rgba(20, 35, 31, 0.09);
+  --ui-border-strong: rgba(20, 35, 31, 0.15);
+  --ui-shadow: 0 12px 34px rgba(20, 35, 31, 0.06);
+  --ui-shadow-hover: 0 16px 38px rgba(20, 35, 31, 0.09);
+  --ui-radius: 20px;
+  --ui-radius-small: 13px;
+  background: #f4f6f4;
+}
+
+.platform-page--member {
+  padding-inline: clamp(14px, 2.5vw, 30px);
+}
+
+.platform-page--member .platform-page__header {
+  position: sticky;
+  z-index: 70;
+  top: 0;
+  width: min(100%, 1240px);
+  min-height: 66px;
+  border-bottom: 1px solid var(--ui-border);
+  background: rgba(244, 246, 244, 0.93);
+  backdrop-filter: blur(18px);
+}
+
+.platform-page--member .platform-page__brand-mark {
+  border-radius: 12px;
+  box-shadow: none;
+}
+
+.platform-page--member .platform-page__back-link {
+  min-height: 40px;
+  border-radius: 11px;
+  font-size: 0.72rem;
+}
+
+.member-app-nav--desktop {
+  border-color: var(--ui-border);
+  border-radius: 13px;
+  padding: 3px;
+  gap: 1px;
+  background: #edf1ed;
+}
+
+.member-app-nav--desktop a {
+  min-height: 38px;
+  border-radius: 10px;
+  padding-inline: 12px;
+  font-size: 0.72rem;
+}
+
+.member-app-nav--desktop a:hover {
+  transform: none;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.member-app-nav--desktop a.is-active {
+  box-shadow: none;
+}
+
+.platform-page--member .platform-page__hero {
+  width: min(100%, 1240px);
+  min-height: 190px;
+  margin-top: 16px;
+  border-color: var(--ui-border);
+  border-radius: var(--ui-radius);
+  padding: clamp(26px, 4vw, 40px);
+  grid-template-columns: minmax(0, 1fr) 185px;
+  gap: 28px;
+  background: #ffffff;
+  box-shadow: var(--ui-shadow);
+}
+
+.platform-page--member .platform-page__hero::after {
+  display: none;
+}
+
+.platform-page--member .platform-page__hero-image {
+  opacity: 0.13;
+  filter: saturate(0.78) contrast(0.94);
+}
+
+.platform-page--member .platform-page__hero h1 {
+  max-width: 760px;
+  font-size: clamp(2.65rem, 4.4vw, 4.25rem);
+  line-height: 0.94;
+  letter-spacing: -0.05em;
+}
+
+.platform-page--member .platform-page__hero p {
+  max-width: 650px;
+  margin-top: 13px;
+  font-size: 0.88rem;
+  line-height: 1.65;
+}
+
+.platform-page--member .platform-page__eyebrow {
+  margin-bottom: 9px;
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+}
+
+.member-app-status {
+  width: 185px;
+  min-height: 112px;
+  border-radius: 16px;
+  padding: 17px;
+  box-shadow: none;
+}
+
+.member-app-status > strong {
+  margin-top: 10px;
+  font-size: 1.55rem;
+  line-height: 0.95;
+}
+
+.member-app-status > small {
+  margin-top: 8px;
+  font-size: 0.68rem;
+  line-height: 1.4;
+}
+
+.platform-page--member .platform-page__content {
+  width: min(100%, 1240px);
+  margin: 16px auto 0;
+  padding-bottom: 26px;
+}
+
+.platform-page :where(input, select, textarea) {
+  width: 100%;
+  border: 1px solid var(--ui-border-strong);
+  border-radius: 12px;
+  color: var(--ink);
+  background: #ffffff;
+  font: inherit;
+  font-size: 0.88rem;
+  outline: none;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.platform-page :where(input, select) {
+  min-height: 46px;
+  padding: 0 13px;
+}
+
+.platform-page textarea {
+  min-height: 118px;
+  padding: 12px 13px;
+  resize: vertical;
+  line-height: 1.55;
+}
+
+.platform-page :where(input, select, textarea):focus {
+  border-color: rgba(37, 93, 80, 0.58);
+  box-shadow: 0 0 0 4px rgba(37, 93, 80, 0.1);
+}
+
+.platform-page :where(button, a, input, select, textarea):focus-visible {
+  outline: 3px solid rgba(37, 93, 80, 0.28);
+  outline-offset: 3px;
+}
+
+.platform-page label > span,
+.platform-page label > small,
+.platform-page :where(.eyebrow, [class*="__eyebrow"]) {
+  font-size: 0.7rem;
+  line-height: 1.35;
+}
+
+.platform-page p {
+  text-wrap: pretty;
+}
+
+.platform-page :where(
+  .platform-placeholder,
+  .favorites-collection-banner,
+  .favorites-saved-section,
+  .favorites-empty-state,
+  .favorites-recommendations,
+  .profile-session-card,
+  .profile-escape-banner,
+  .profile-reward-journey,
+  .profile-recent-section,
+  .my-stays-overview,
+  .my-stays-list,
+  .my-stays-empty,
+  .notifications-summary,
+  .notifications-feed,
+  .stay-confirmation,
+  .stay-empty,
+  .manager-stay-overview,
+  .manager-settings-panel,
+  .manager-chat-panel,
+  .manager-activity-card
+) {
+  border-radius: var(--ui-radius);
+  border-color: var(--ui-border);
+  box-shadow: var(--ui-shadow);
+}
+
+.platform-page :where(
+  .platform-placeholder,
+  .favorites-collection-banner,
+  .profile-escape-banner,
+  .my-stays-overview,
+  .notifications-summary,
+  .manager-stay-overview
+) {
+  min-height: 320px;
+}
+
+.platform-page .platform-placeholder {
+  padding: clamp(34px, 6vw, 64px);
+  background: #ffffff;
+}
+
+.platform-page .platform-placeholder::after {
+  opacity: 0.3;
+}
+
+.platform-page .platform-placeholder h2 {
+  max-width: 760px;
+  font-size: clamp(2.8rem, 4.8vw, 4.8rem);
+  line-height: 0.94;
+}
+
+.platform-page .platform-placeholder p {
+  max-width: 690px;
+  font-size: 0.88rem;
+  line-height: 1.65;
+}
+
+.platform-page :where(
+  .favorites-collection-banner__copy h2,
+  .profile-escape-banner__content h2,
+  .my-stays-overview h2,
+  .notifications-summary h2,
+  .manager-stay-overview h2
+) {
+  font-size: clamp(3rem, 5vw, 4.8rem);
+  line-height: 0.9;
+}
+
+.favorites-app,
+.profile-visual-dashboard,
+.my-stays,
+.notifications-center,
+.manager-stay-dashboard {
+  gap: 16px;
+}
+
+.favorites-property-grid,
+.profile-property-grid,
+.my-stays-grid,
+.notifications-list {
+  gap: 12px;
+}
+
+.favorites-property-card,
+.profile-property-card,
+.my-stay-card,
+.notification-entry {
+  border-radius: 17px;
+  border-color: var(--ui-border);
+  box-shadow: 0 8px 24px rgba(20, 35, 31, 0.05);
+}
+
+.favorites-property-card:hover,
+.profile-property-card:hover,
+.my-stay-card:hover,
+.notification-entry:hover {
+  transform: none;
+  border-color: rgba(37, 93, 80, 0.2);
+  box-shadow: var(--ui-shadow-hover);
+}
+
+.my-stay-card__media {
+  min-height: 245px;
+}
+
+.notification-entry {
+  padding: 15px;
+}
+
+.notification-entry__icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 13px;
+}
+
+.notification-entry__content h3 {
+  font-size: 1.45rem;
+}
+
+.notification-entry__content p,
+.my-stay-card__content,
+.favorites-property-card p,
+.profile-property-card p {
+  font-size: 0.78rem;
+}
+
+.notifications-filters button {
+  min-height: 38px;
+  border-radius: 10px;
+  font-size: 0.7rem;
+}
+
+.manager-stay-grid,
+.manager-field-grid,
+.manager-reminders,
+.manager-member-activity {
+  gap: 14px;
+}
+
+.manager-settings-panel,
+.manager-chat-panel,
+.manager-activity-card {
+  padding: clamp(24px, 3.5vw, 38px);
+}
+
+.property-section,
+.property-overview,
+.property-booking {
+  border-radius: 18px;
+  border-color: var(--ui-border);
+  box-shadow: 0 9px 28px rgba(20, 35, 31, 0.055);
+}
+
+.property-heading h1 {
+  font-size: clamp(3rem, 5.8vw, 5.4rem);
+}
+
+.property-booking :where(button, a) {
+  min-height: 44px;
+}
+
+.reservation-portal,
+.reservation-portal__details,
+.reservation-portal__content-grid {
+  gap: 14px;
+}
+
+.reservation-portal__hero {
+  border-radius: 20px;
+}
+
+@media (max-width: 1080px) {
+  .platform-page--member .platform-page__header {
+    position: relative;
+  }
+
+  .platform-page--member .platform-page__hero {
+    grid-template-columns: minmax(0, 1fr) 165px;
+  }
+
+  .member-app-status {
+    width: 165px;
+  }
+}
+
+@media (max-width: 820px) {
+  .platform-page--member {
+    padding: 0 12px 104px;
+  }
+
+  .platform-page--member .platform-page__header {
+    min-height: 62px;
+  }
+
+  .platform-page--member .platform-page__hero {
+    min-height: 0;
+    margin-top: 12px;
+    border-radius: 17px;
+    padding: 24px 20px;
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .platform-page--member .platform-page__hero h1 {
+    font-size: clamp(2.7rem, 12vw, 4rem);
+  }
+
+  .platform-page--member .platform-page__hero p {
+    font-size: 0.84rem;
+  }
+
+  .member-app-status {
+    display: none;
+  }
+
+  .member-app-nav--mobile {
+    border-top: 1px solid var(--ui-border);
+    padding:
+      8px max(10px, env(safe-area-inset-right))
+      calc(8px + env(safe-area-inset-bottom))
+      max(10px, env(safe-area-inset-left));
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(18px);
+  }
+
+  .member-app-nav--mobile a {
+    min-height: 54px;
+    border-radius: 11px;
+    font-size: 0.68rem;
+  }
+
+  .platform-page :where(
+    .platform-placeholder,
+    .favorites-collection-banner,
+    .profile-escape-banner,
+    .my-stays-overview,
+    .notifications-summary,
+    .manager-stay-overview
+  ) {
+    min-height: 0;
+    padding: 28px 21px;
+  }
+
+  .platform-page :where(
+    .favorites-collection-banner__copy h2,
+    .profile-escape-banner__content h2,
+    .my-stays-overview h2,
+    .notifications-summary h2,
+    .manager-stay-overview h2
+  ) {
+    font-size: clamp(2.8rem, 13vw, 4.2rem);
+  }
+
+  .my-stay-card__media {
+    min-height: 225px;
+  }
+}
+
+@media (max-width: 520px) {
+  .platform-page--member {
+    padding-inline: 9px;
+  }
+
+  .platform-page--member .platform-page__hero,
+  .platform-page :where(
+    .platform-placeholder,
+    .favorites-collection-banner,
+    .favorites-saved-section,
+    .favorites-empty-state,
+    .favorites-recommendations,
+    .profile-session-card,
+    .profile-escape-banner,
+    .profile-reward-journey,
+    .profile-recent-section,
+    .my-stays-overview,
+    .my-stays-list,
+    .my-stays-empty,
+    .notifications-summary,
+    .notifications-feed,
+    .manager-stay-overview,
+    .manager-settings-panel,
+    .manager-chat-panel,
+    .manager-activity-card
+  ) {
+    border-radius: 15px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .platform-page *,
+  .platform-page *::before,
+  .platform-page *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+/* ==================================================
+   QUIET TRAVEL APP DIRECTION
+   Image-led, soft sage, deep green, modern sans-serif.
+   The locked homepage header and accordion hero remain untouched.
+   ================================================== */
+
+.platform-page {
+  --accent: #183f31;
+  --accent-soft: #dce9df;
+  --ink: #111814;
+  --muted: #6d7771;
+  --gold: #e2bf46;
+  --gold-deep: #8d7324;
+  --gold-soft: #f6efcf;
+  --display: var(--sans);
+  background: #e9f0e7;
+}
+
+.platform-page :where(h1, h2, h3, h4) {
+  font-family: var(--sans);
+  letter-spacing: -0.045em;
+}
+
+.platform-page--member .platform-page__header {
+  border: 1px solid rgba(17, 24, 20, 0.07);
+  border-radius: 18px;
+  padding-inline: 12px;
+  background: rgba(250, 252, 249, 0.94);
+  box-shadow: 0 10px 30px rgba(17, 24, 20, 0.05);
+}
+
+.platform-page--member .platform-page__brand-mark {
+  color: #ffffff;
+  background: #183f31;
+}
+
+.platform-page--member .platform-page__brand-copy,
+.platform-page--member .platform-page__hero h1,
+.platform-page :where(h2, h3) {
+  font-weight: 760;
+}
+
+.member-app-nav--desktop {
+  border: 0;
+  background: transparent;
+}
+
+.member-app-nav--desktop a {
+  color: #6f7973;
+  background: transparent;
+}
+
+.member-app-nav--desktop a.is-active {
+  color: #ffffff;
+  background: #183f31;
+}
+
+.member-app-nav--desktop a[href="/notifications"] {
+  border: 1px solid rgba(17, 24, 20, 0.08);
+  background: #ffffff;
+}
+
+.member-app-nav--desktop a[href="/notifications"].is-active {
+  color: #ffffff;
+  border-color: #183f31;
+  background: #183f31;
+}
+
+.platform-page--member .platform-page__hero {
+  border: 0;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 18px 48px rgba(25, 55, 43, 0.07);
+}
+
+.platform-page--member .platform-page__hero-image {
+  opacity: 0.18;
+  filter: saturate(0.72) contrast(0.9);
+}
+
+.platform-page--member .platform-page__hero h1 {
+  font-size: clamp(2.5rem, 4.1vw, 3.95rem);
+  line-height: 0.95;
+}
+
+.member-app-status {
+  color: #111814;
+  border: 1px solid rgba(17, 24, 20, 0.07);
+  background: #eef4eb;
+}
+
+.member-app-status > span,
+.member-app-status > small {
+  color: #6d7771;
+}
+
+.member-app-status > strong {
+  color: #183f31;
+}
+
+/* Login, signup, legal, and account-entry surfaces */
+
+.access-grid {
+  width: min(100%, 1080px);
+  margin-inline: auto;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 0.72fr);
+  gap: 16px;
+}
+
+.access-card,
+.access-aside,
+.legal-document {
+  border: 0;
+  border-radius: 24px;
+  box-shadow: 0 18px 50px rgba(25, 55, 43, 0.07);
+}
+
+.access-card,
+.legal-document {
+  background: rgba(255, 255, 255, 0.96);
+}
+
+.access-aside {
+  color: #ffffff;
+  background:
+    radial-gradient(circle at 90% 5%, rgba(226, 191, 70, 0.28), transparent 14rem),
+    #183f31;
+}
+
+.access-card__heading h2,
+.access-aside h2,
+.legal-document__header h2 {
+  font-family: var(--sans);
+  font-weight: 780;
+  letter-spacing: -0.045em;
+}
+
+.access-field input,
+.access-field select,
+.access-field textarea {
+  border-color: transparent;
+  background: #f1f4f0;
+}
+
+.access-submit {
+  min-height: 50px;
+  border-radius: 15px;
+  background: #111814;
+}
+
+.access-switch a {
+  color: #183f31;
+}
+
+/* Homepage below the locked hero */
+
+.rewards-preview,
+.quick-search,
+.contact-section {
+  border-radius: 24px;
+}
+
+.rewards-preview {
+  border: 0;
+  background: #e3ecdf;
+  box-shadow: none;
+}
+
+.rewards-preview__intro h2,
+.quick-search .section-heading h2,
+.contact-section h2 {
+  font-family: var(--sans);
+  font-weight: 780;
+  letter-spacing: -0.045em;
+}
+
+.quick-search {
+  padding: clamp(30px, 5vw, 58px);
+  background: #eef4eb;
+}
+
+.search-panel {
+  border: 0;
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow: 0 16px 42px rgba(25, 55, 43, 0.07);
+}
+
+.search-panel :where(select, button) {
+  min-height: 48px;
+  border-radius: 14px;
+}
+
+.property-grid {
+  gap: 14px;
+}
+
+.property-grid > * {
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: 0 12px 34px rgba(25, 55, 43, 0.06);
+}
+
+.contact-section {
+  color: #ffffff;
+  background: #183f31;
+  box-shadow: none;
+}
+
+.contact-section p {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Image-first saved property cards */
+
+.favorites-property-card__gallery {
+  min-height: 280px;
+}
+
+.favorites-property-card__main-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.favorites-property-card__thumbnails,
+.favorites-property-card__social {
+  display: none;
+}
+
+.favorites-property-card__body {
+  padding: 18px;
+}
+
+.favorites-property-card__body > p {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.favorites-property-card__details {
+  gap: 6px;
+}
+
+.favorites-property-card__details span {
+  border-radius: 999px;
+  padding: 7px 10px;
+  background: #eef4eb;
+}
+
+/* My Stays becomes a travel wallet */
+
+.my-stays-overview,
+.notifications-summary,
+.manager-stay-overview {
+  background-color: #183f31;
+}
+
+.my-stays-grid {
+  align-items: stretch;
+}
+
+.my-stay-card:first-child {
+  grid-column: 1 / -1;
+}
+
+.my-stay-card__status,
+.notification-entry__icon,
+.notifications-filters button {
+  border-radius: 999px;
+}
+
+.my-stay-card__facts > span,
+.my-stay-card__dates > span {
+  border: 0;
+  background: #f0f4ef;
+}
+
+/* Notification timeline */
+
+.notifications-summary {
+  background:
+    radial-gradient(circle at 90% 0%, rgba(226, 191, 70, 0.24), transparent 18rem),
+    #183f31;
+}
+
+.notification-entry {
+  border: 0;
+  background: rgba(255, 255, 255, 0.96);
+}
+
+.notification-entry.is-unread {
+  background: linear-gradient(90deg, #edf4ea, #ffffff 34%);
+}
+
+.notifications-filters button {
+  border: 0;
+  background: #edf2ec;
+}
+
+.notifications-filters button.is-active {
+  background: #183f31;
+}
+
+/* Profile and reward surfaces */
+
+.profile-session-card,
+.profile-reward-journey,
+.profile-recent-section {
+  border: 0;
+  background: rgba(255, 255, 255, 0.96);
+}
+
+.profile-session-card__avatar {
+  color: #ffffff;
+  background: #183f31;
+}
+
+.profile-session-card__logout {
+  border-radius: 999px;
+}
+
+.profile-escape-banner,
+.profile-reward-journey {
+  min-height: 310px;
+}
+
+/* Property detail, checkout, portal, and manager workspace */
+
+.property-app,
+.stay-confirmation,
+.reservation-portal,
+.manager-stay-dashboard {
+  color: #111814;
+}
+
+.property-gallery__featured,
+.stay-property-hero,
+.reservation-portal__hero,
+.manager-stay-overview {
+  border-radius: 24px;
+}
+
+.property-booking,
+.stay-confirmation__summary,
+.manager-settings-panel,
+.manager-chat-panel,
+.manager-activity-card {
+  border: 0;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 16px 42px rgba(25, 55, 43, 0.065);
+}
+
+.property-booking button,
+.stay-confirmation button,
+.manager-settings-actions button,
+.manager-chat-composer button,
+.manager-activity-card button {
+  border-radius: 14px;
+}
+
+.manager-member-activity {
+  align-items: start;
+}
+
+.manager-activity-card header h2,
+.manager-settings-panel header h2,
+.manager-chat-panel header h2 {
+  font-family: var(--sans);
+  font-weight: 760;
+}
+
+/* Mobile floating app navigation */
+
+@media (max-width: 820px) {
+  .member-app-nav--mobile,
+  .mobile-nav {
+    left: 50%;
+    right: auto;
+    bottom: 10px;
+    width: min(calc(100% - 20px), 560px);
+    border: 1px solid rgba(17, 24, 20, 0.08);
+    border-radius: 24px;
+    transform: translateX(-50%);
+    box-shadow: 0 18px 48px rgba(17, 24, 20, 0.16);
+  }
+
+  .member-app-nav--mobile {
+    background: rgba(255, 255, 255, 0.96);
+  }
+
+  .member-app-nav--mobile a.is-active,
+  .mobile-nav button.is-active {
+    color: #ffffff;
+    background: #183f31;
+  }
+
+  .quick-search {
+    padding: 24px 16px;
+  }
+
+  .access-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .access-aside {
+    order: -1;
+  }
+
+  .my-stay-card:first-child {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 560px) {
+  .platform-page--member .platform-page__header {
+    border-radius: 15px;
+  }
+
+  .platform-page--member .platform-page__hero,
+  .access-card,
+  .access-aside,
+  .legal-document,
+  .favorites-property-card,
+  .my-stay-card,
+  .notification-entry,
+  .manager-settings-panel,
+  .manager-chat-panel,
+  .manager-activity-card {
+    border-radius: 18px;
+  }
+
+  .favorites-property-card__gallery,
+  .my-stay-card__media {
+    min-height: 230px;
+  }
+}

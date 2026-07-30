@@ -308,6 +308,8 @@ function ReservationPortalPage() {
 
   useEffect(() => {
     if (!property) {
+      // Clear settings when the referenced property is unavailable.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSettings(null)
       return
     }
@@ -321,6 +323,8 @@ function ReservationPortalPage() {
 
   useEffect(() => {
     if (!reservation || !property) {
+      // Clear a prior conversation when no valid stay is available.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setMessages([])
       return
     }

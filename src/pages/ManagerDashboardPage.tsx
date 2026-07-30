@@ -163,6 +163,8 @@ function ManagerDashboardPage() {
   ] = useState('')
 
   useEffect(() => {
+    // Synchronize persisted portal settings with the selected property.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSettings(
       getStayPortalSettings(
         selectedPropertyId,
@@ -191,6 +193,8 @@ function ManagerDashboardPage() {
       !selectedReservation ||
       !selectedProperty
     ) {
+      // Clear a prior conversation when no reservation is selected.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setMessages([])
       return
     }
