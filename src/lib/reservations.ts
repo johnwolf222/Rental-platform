@@ -1,3 +1,5 @@
+import { checkPropertyAvailability } from './availability'
+
 export type ReservationPaymentPlan =
   | 'pay-in-full'
   | 'split-stay'
@@ -6,6 +8,9 @@ export type ReservationPaymentMethod =
   | 'card'
   | 'paypal'
   | 'apple-pay'
+
+export const RESERVATIONS_UPDATED_EVENT =
+  'rental-platform-reservations-updated'
 
 export type ReservationRecord = {
   id: string
@@ -81,6 +86,19 @@ export function createReservation(
     | 'createdAt'
   >,
 ): ReservationRecord {
+  const currentReservations = readReservations()
+
+  const availability = checkPropertyAvailability({
+    propertyId: input.propertyId,
+    checkIn: input.checkIn,
+    checkOut: input.checkOut,
+    reservations: currentReservations,
+  })
+
+  if (!availability.available) {
+    throw new Error(availability.message)
+  }
+
   const reservation: ReservationRecord = {
     ...input,
     id: createReservationId(),
@@ -89,14 +107,16 @@ export function createReservation(
     createdAt: new Date().toISOString(),
   }
 
-  const currentReservations = readReservations()
-
   window.localStorage.setItem(
     RESERVATIONS_STORAGE_KEY,
     JSON.stringify([
       reservation,
       ...currentReservations,
     ]),
+  )
+
+  window.dispatchEvent(
+    new CustomEvent(RESERVATIONS_UPDATED_EVENT),
   )
 
   return reservation

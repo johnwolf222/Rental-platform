@@ -1,6 +1,14 @@
 import { creditRewardPoints } from '../lib/rewards'
 import { createNotification } from '../lib/notifications'
 import {
+  AVAILABILITY_UPDATED_EVENT,
+  checkPropertyAvailability,
+  formatUnavailableRange,
+  getPropertyUnavailableRanges,
+  getTodayDateValue,
+} from '../lib/availability'
+import {
+  useEffect,
   useMemo,
   useState,
 } from 'react'
@@ -17,9 +25,12 @@ import {
 } from '../lib/bookingIntent'
 import {
   createReservation,
+  getReservations,
+  RESERVATIONS_UPDATED_EVENT,
   type ReservationPaymentMethod,
   type ReservationPaymentPlan,
 } from '../lib/reservations'
+import '../components/booking/BookingAvailability.css'
 import './StayConfirmationExperience.css'
 
 const currencyFormatter =
@@ -159,6 +170,46 @@ function BookingReviewPage() {
     setAcceptedConfirmation,
   ] = useState(false)
 
+  const [availabilityError, setAvailabilityError] =
+    useState('')
+  const [availabilityVersion, setAvailabilityVersion] =
+    useState(0)
+
+  useEffect(() => {
+    const refreshAvailability = () =>
+      setAvailabilityVersion(
+        (currentVersion) => currentVersion + 1,
+      )
+
+    window.addEventListener(
+      AVAILABILITY_UPDATED_EVENT,
+      refreshAvailability,
+    )
+    window.addEventListener(
+      RESERVATIONS_UPDATED_EVENT,
+      refreshAvailability,
+    )
+    window.addEventListener(
+      'storage',
+      refreshAvailability,
+    )
+
+    return () => {
+      window.removeEventListener(
+        AVAILABILITY_UPDATED_EVENT,
+        refreshAvailability,
+      )
+      window.removeEventListener(
+        RESERVATIONS_UPDATED_EVENT,
+        refreshAvailability,
+      )
+      window.removeEventListener(
+        'storage',
+        refreshAvailability,
+      )
+    }
+  }, [])
+
   const nights = calculateNights(
     checkIn,
     checkOut,
@@ -228,9 +279,40 @@ function BookingReviewPage() {
     property,
   ])
 
-  const today = new Date()
-    .toISOString()
-    .split('T')[0]
+  const today = getTodayDateValue()
+
+  const reservations = useMemo(
+    () => getReservations(),
+    [availabilityVersion],
+  )
+
+  const unavailableRanges = property
+    ? getPropertyUnavailableRanges(
+        property.id,
+        reservations,
+      ).filter(
+        (range) => range.endDate >= today,
+      )
+    : []
+
+  const availability = property
+    ? checkPropertyAvailability({
+        propertyId: property.id,
+        checkIn,
+        checkOut,
+        reservations,
+      })
+    : {
+        available: false,
+        message: '',
+        conflicts: [],
+      }
+
+  const availabilityMessage =
+    availabilityError ||
+    (checkIn && checkOut
+      ? availability.message
+      : '')
 
   const canConfirm =
     Boolean(user) &&
@@ -238,6 +320,7 @@ function BookingReviewPage() {
     Boolean(intent) &&
     nights > 0 &&
     guests > 0 &&
+    availability.available &&
     acceptedConfirmation
 
   const handleConfirmStay = () => {
@@ -250,7 +333,29 @@ function BookingReviewPage() {
       return
     }
 
-    const reservation = createReservation({
+    const latestAvailability =
+      checkPropertyAvailability({
+        propertyId: property.id,
+        checkIn,
+        checkOut,
+        reservations: getReservations(),
+      })
+
+    if (!latestAvailability.available) {
+      setAvailabilityError(
+        latestAvailability.message,
+      )
+      return
+    }
+
+    setAvailabilityError('')
+
+    let reservation: ReturnType<
+      typeof createReservation
+    >
+
+    try {
+      reservation = createReservation({
       memberId: user.id,
       propertyId: property.id,
       propertyTitle: property.title,
@@ -272,9 +377,17 @@ function BookingReviewPage() {
         financials.remainingBalance,
       paymentPlan,
       paymentMethod,
-      expectedPoints:
-        financials.expectedPoints,
-    })
+        expectedPoints:
+          financials.expectedPoints,
+      })
+    } catch (error) {
+      setAvailabilityError(
+        error instanceof Error
+          ? error.message
+          : 'These dates are no longer available.',
+      )
+      return
+    }
 
     const rewardResult =
       creditRewardPoints({
@@ -435,11 +548,20 @@ function BookingReviewPage() {
                     type="date"
                     min={today}
                     value={checkIn}
-                    onChange={(event) =>
-                      setCheckIn(
-                        event.target.value,
-                      )
-                    }
+                    onChange={(event) => {
+                      const nextCheckIn =
+                        event.target.value
+
+                      setAvailabilityError('')
+                      setCheckIn(nextCheckIn)
+
+                      if (
+                        checkOut &&
+                        nextCheckIn >= checkOut
+                      ) {
+                        setCheckOut('')
+                      }
+                    }}
                   />
                 </label>
 
@@ -450,11 +572,12 @@ function BookingReviewPage() {
                     type="date"
                     min={checkIn || today}
                     value={checkOut}
-                    onChange={(event) =>
+                    onChange={(event) => {
+                      setAvailabilityError('')
                       setCheckOut(
                         event.target.value,
                       )
-                    }
+                    }}
                   />
                 </label>
 
@@ -505,6 +628,44 @@ function BookingReviewPage() {
                       : 'Select valid dates'}
                   </strong>
                 </div>
+              </div>
+
+              <div
+                className={`booking-availability ${
+                  availabilityMessage &&
+                  !availability.available
+                    ? 'is-conflict'
+                    : ''
+                }`}
+                aria-live="polite"
+              >
+                <div className="booking-availability__status">
+                  <i aria-hidden="true" />
+                  <div>
+                    <strong>
+                      {availabilityMessage ||
+                        'Availability is checked again before confirmation.'}
+                    </strong>
+                    <p>
+                      {availability.available
+                        ? 'The selected stay is currently available.'
+                        : 'Select dates that do not overlap a reserved or manager-blocked range.'}
+                    </p>
+                  </div>
+                </div>
+
+                {unavailableRanges.length > 0 && (
+                  <ul className="booking-availability__ranges">
+                    {unavailableRanges
+                      .slice(0, 5)
+                      .map((range) => (
+                        <li key={`${range.source}:${range.id}`}>
+                          <span>{formatUnavailableRange(range)}</span>
+                          <small>{range.label}</small>
+                        </li>
+                      ))}
+                  </ul>
+                )}
               </div>
             </article>
 

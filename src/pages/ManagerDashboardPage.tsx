@@ -5,6 +5,12 @@ import {
 } from '../lib/rewards'
 import { createNotification } from '../lib/notifications'
 import {
+  addManagerDateBlock,
+  formatUnavailableRange,
+  getManagerDateBlocks,
+  removeManagerDateBlock,
+} from '../lib/availability'
+import {
   useEffect,
   useMemo,
   useState,
@@ -30,6 +36,7 @@ import {
   STAY_CHAT_UPDATED_EVENT,
   type StayChatMessage,
 } from '../lib/stayChat'
+import '../components/booking/BookingAvailability.css'
 import './ManagerStayExperience.css'
 
 const dateFormatter =
@@ -161,6 +168,22 @@ function ManagerDashboardPage() {
     pointStatus,
     setPointStatus,
   ] = useState('')
+
+  const [blockStartDate, setBlockStartDate] =
+    useState('')
+  const [blockEndDate, setBlockEndDate] =
+    useState('')
+  const [blockReason, setBlockReason] =
+    useState('Maintenance or owner hold')
+  const [availabilityStatus, setAvailabilityStatus] =
+    useState('')
+  const [availabilityVersion, setAvailabilityVersion] =
+    useState(0)
+
+  const managerDateBlocks = useMemo(
+    () => getManagerDateBlocks(selectedPropertyId),
+    [selectedPropertyId, availabilityVersion],
+  )
 
   useEffect(() => {
     // Synchronize persisted portal settings with the selected property.
@@ -470,6 +493,57 @@ function ManagerDashboardPage() {
     }
   }
 
+  const handleAddDateBlock = (
+    event: FormEvent<HTMLFormElement>,
+  ) => {
+    event.preventDefault()
+
+    try {
+      addManagerDateBlock(
+        {
+          propertyId: selectedPropertyId,
+          startDate: blockStartDate,
+          endDate: blockEndDate,
+          reason: blockReason,
+        },
+        getReservations(),
+      )
+
+      setBlockStartDate('')
+      setBlockEndDate('')
+      setAvailabilityStatus(
+        'Unavailable dates saved.',
+      )
+      setAvailabilityVersion(
+        (currentVersion) => currentVersion + 1,
+      )
+    } catch (error) {
+      setAvailabilityStatus(
+        error instanceof Error
+          ? error.message
+          : 'The unavailable dates could not be saved.',
+      )
+    }
+  }
+
+  const handleRemoveDateBlock = (
+    blockId: string,
+  ) => {
+    if (!removeManagerDateBlock(blockId)) {
+      setAvailabilityStatus(
+        'That blocked range was not found.',
+      )
+      return
+    }
+
+    setAvailabilityStatus(
+      'Unavailable dates removed.',
+    )
+    setAvailabilityVersion(
+      (currentVersion) => currentVersion + 1,
+    )
+  }
+
   const selectedMemberBalance =
     selectedReservation
       ? getRewardBalance(
@@ -520,13 +594,14 @@ function ManagerDashboardPage() {
 
               <select
                 value={selectedPropertyId}
-                onChange={(event) =>
+                onChange={(event) => {
                   setSelectedPropertyId(
                     Number(
                       event.target.value,
                     ),
                   )
-                }
+                  setAvailabilityStatus('')
+                }}
               >
                 {properties.map(
                   (property) => (
@@ -578,6 +653,108 @@ function ManagerDashboardPage() {
             </span>
           </aside>
         </article>
+
+        <section
+          className="manager-availability-panel"
+          aria-label="Property availability controls"
+        >
+          <header className="manager-availability-panel__header">
+            <div>
+              <span>Booking availability</span>
+              <h2>Block unavailable dates.</h2>
+            </div>
+
+            <p>
+              Confirmed reservations are blocked automatically.
+              Add maintenance, owner-use, or preparation holds here.
+            </p>
+          </header>
+
+          <form
+            className="manager-availability-form"
+            onSubmit={handleAddDateBlock}
+          >
+            <label>
+              <span>Unavailable from</span>
+              <input
+                type="date"
+                value={blockStartDate}
+                onChange={(event) => {
+                  setBlockStartDate(event.target.value)
+                  setAvailabilityStatus('')
+                }}
+                required
+              />
+            </label>
+
+            <label>
+              <span>Available again</span>
+              <input
+                type="date"
+                min={blockStartDate || undefined}
+                value={blockEndDate}
+                onChange={(event) => {
+                  setBlockEndDate(event.target.value)
+                  setAvailabilityStatus('')
+                }}
+                required
+              />
+            </label>
+
+            <label>
+              <span>Reason</span>
+              <input
+                value={blockReason}
+                onChange={(event) =>
+                  setBlockReason(event.target.value)
+                }
+                placeholder="Maintenance or owner hold"
+              />
+            </label>
+
+            <button type="submit">Block dates</button>
+          </form>
+
+          {availabilityStatus && (
+            <p
+              className="manager-availability-panel__message"
+              role="status"
+            >
+              {availabilityStatus}
+            </p>
+          )}
+
+          <div className="manager-availability-list">
+            {managerDateBlocks.length > 0 ? (
+              managerDateBlocks.map((block) => (
+                <article key={block.id}>
+                  <div>
+                    <strong>
+                      {formatUnavailableRange({
+                        startDate: block.startDate,
+                        endDate: block.endDate,
+                      })}
+                    </strong>
+                    <small>{block.reason}</small>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      handleRemoveDateBlock(block.id)
+                    }
+                  >
+                    Remove
+                  </button>
+                </article>
+              ))
+            ) : (
+              <p className="manager-availability-list__empty">
+                No manager-blocked dates for this property.
+              </p>
+            )}
+          </div>
+        </section>
 
         <div className="manager-stay-grid">
           <section className="manager-settings-panel">

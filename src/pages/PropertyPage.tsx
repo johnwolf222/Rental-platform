@@ -14,7 +14,19 @@ import {
   properties,
 } from '../data/properties'
 import { saveBookingIntent } from '../lib/bookingIntent'
+import {
+  AVAILABILITY_UPDATED_EVENT,
+  checkPropertyAvailability,
+  formatUnavailableRange,
+  getPropertyUnavailableRanges,
+  getTodayDateValue,
+} from '../lib/availability'
 import { usePersistentFavorites } from '../lib/favorites'
+import {
+  getReservations,
+  RESERVATIONS_UPDATED_EVENT,
+} from '../lib/reservations'
+import '../components/booking/BookingAvailability.css'
 import './PropertyPage.css'
 import './PropertyAppExperience.css'
 
@@ -217,6 +229,10 @@ function PropertyPage() {
   const [checkIn, setCheckIn] = useState('')
   const [checkOut, setCheckOut] = useState('')
   const [guestCount, setGuestCount] = useState(1)
+  const [availabilityError, setAvailabilityError] =
+    useState('')
+  const [availabilityVersion, setAvailabilityVersion] =
+    useState(0)
 
   useEffect(() => {
     // Reset property-specific gallery and booking state after route changes.
@@ -226,7 +242,43 @@ function PropertyPage() {
     setCheckOut('')
     setGuestCount(1)
     window.scrollTo({ top: 0, behavior: 'smooth' })
+    setAvailabilityError('')
   }, [propertyId])
+
+  useEffect(() => {
+    const refreshAvailability = () =>
+      setAvailabilityVersion(
+        (currentVersion) => currentVersion + 1,
+      )
+
+    window.addEventListener(
+      AVAILABILITY_UPDATED_EVENT,
+      refreshAvailability,
+    )
+    window.addEventListener(
+      RESERVATIONS_UPDATED_EVENT,
+      refreshAvailability,
+    )
+    window.addEventListener(
+      'storage',
+      refreshAvailability,
+    )
+
+    return () => {
+      window.removeEventListener(
+        AVAILABILITY_UPDATED_EVENT,
+        refreshAvailability,
+      )
+      window.removeEventListener(
+        RESERVATIONS_UPDATED_EVENT,
+        refreshAvailability,
+      )
+      window.removeEventListener(
+        'storage',
+        refreshAvailability,
+      )
+    }
+  }, [])
 
   const gallery = useMemo(() => {
     if (!property) {
@@ -257,6 +309,41 @@ function PropertyPage() {
   const expectedPoints = property
     ? property.pointsPerNight * nights
     : 0
+
+  const today = getTodayDateValue()
+
+  const reservations = useMemo(
+    () => getReservations(),
+    [availabilityVersion],
+  )
+
+  const unavailableRanges = property
+    ? getPropertyUnavailableRanges(
+        property.id,
+        reservations,
+      ).filter(
+        (range) => range.endDate >= today,
+      )
+    : []
+
+  const availability = property
+    ? checkPropertyAvailability({
+        propertyId: property.id,
+        checkIn,
+        checkOut,
+        reservations,
+      })
+    : {
+        available: false,
+        message: '',
+        conflicts: [],
+      }
+
+  const availabilityMessage =
+    availabilityError ||
+    (checkIn && checkOut
+      ? availability.message
+      : '')
 
   const saved = property
     ? favorites.has(property.id)
@@ -575,8 +662,10 @@ function PropertyPage() {
                   <DetailIcon name="calendar" size={17} />
                   <input
                     type="date"
+                    min={today}
                     value={checkIn}
                     onChange={(event) => {
+                      setAvailabilityError('')
                       setCheckIn(event.target.value)
 
                       if (
@@ -596,11 +685,12 @@ function PropertyPage() {
                   <DetailIcon name="calendar" size={17} />
                   <input
                     type="date"
-                    min={checkIn || undefined}
+                    min={checkIn || today}
                     value={checkOut}
-                    onChange={(event) =>
+                    onChange={(event) => {
+                      setAvailabilityError('')
                       setCheckOut(event.target.value)
-                    }
+                    }}
                   />
                 </div>
               </label>
@@ -632,6 +722,46 @@ function PropertyPage() {
               </label>
             </div>
 
+            <div
+              className={`booking-availability ${
+                availabilityMessage &&
+                !availability.available
+                  ? 'is-conflict'
+                  : ''
+              }`}
+              aria-live="polite"
+            >
+              <div className="booking-availability__status">
+                <i aria-hidden="true" />
+                <div>
+                  <strong>
+                    {availabilityMessage ||
+                      'Review unavailable dates'}
+                  </strong>
+                  <p>
+                    {availabilityMessage
+                      ? availability.available
+                        ? 'You may continue to confirmation.'
+                        : 'Choose a stay that does not cross an unavailable night.'
+                      : 'Reserved and manager-blocked ranges are listed below.'}
+                  </p>
+                </div>
+              </div>
+
+              {unavailableRanges.length > 0 && (
+                <ul className="booking-availability__ranges">
+                  {unavailableRanges
+                    .slice(0, 5)
+                    .map((range) => (
+                      <li key={`${range.source}:${range.id}`}>
+                        <span>{formatUnavailableRange(range)}</span>
+                        <small>{range.label}</small>
+                      </li>
+                    ))}
+                </ul>
+              )}
+            </div>
+
             <div className="property-booking__summary">
               <span>
                 <span>
@@ -661,8 +791,28 @@ function PropertyPage() {
             <button
               type="button"
               className="property-booking__primary"
-              disabled={nights === 0}
+              disabled={
+                nights === 0 ||
+                !availability.available
+              }
               onClick={() => {
+                const latestAvailability =
+                  checkPropertyAvailability({
+                    propertyId: property.id,
+                    checkIn,
+                    checkOut,
+                    reservations: getReservations(),
+                  })
+
+                if (!latestAvailability.available) {
+                  setAvailabilityError(
+                    latestAvailability.message,
+                  )
+                  return
+                }
+
+                setAvailabilityError('')
+
                 saveBookingIntent({
                   propertyId: property.id,
                   propertyTitle: property.title,
