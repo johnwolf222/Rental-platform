@@ -120,9 +120,6 @@ function ProfilePage() {
   const featuredProperty =
     properties[5] ?? heroProperty
 
-  const rewardBackdrop =
-    properties[1] ?? heroProperty
-
   const recommendedProperties =
     properties.slice(0, 3)
 
@@ -143,6 +140,16 @@ function ProfilePage() {
         100,
     ),
     100,
+  )
+
+  const firstRewardRemaining = Math.max(
+    FIRST_REWARD_POINTS - currentPoints,
+    0,
+  )
+
+  const secondRewardRemaining = Math.max(
+    SECOND_REWARD_POINTS - currentPoints,
+    0,
   )
 
   const handleLogout = () => {
@@ -389,91 +396,70 @@ function ProfilePage() {
         </section>
 
         <section className="profile-reward-journey">
-          <img
-            className="profile-reward-journey__backdrop"
-            src={rewardBackdrop.image}
-            alt=""
-            aria-hidden="true"
-          />
-
-          <div className="profile-reward-journey__shade" />
-
           <header className="profile-reward-journey__header">
             <div>
-              <span>Member reward journey</span>
+              <span>Member rewards</span>
 
               <h2>
                 {currentPoints.toLocaleString('en-US')}
-                <small> available points</small>
+                <small> points available</small>
               </h2>
+
+              <p>
+                Earn points with confirmed stays and
+                redeem them for free-night rewards.
+              </p>
             </div>
 
             <Link to="/stays">
-              Open My Stays
+              My Stays
               <span aria-hidden="true">→</span>
             </Link>
           </header>
 
           <div className="profile-reward-milestones">
             <article>
-              <div>
-                <span>1,400-Point Reward</span>
-                <strong>{firstRewardProgress}%</strong>
-              </div>
+              <header>
+                <div>
+                  <span>1,400 points</span>
 
-              <h3>
-                Book 2 Nights, Get the 3rd Night FREE
-              </h3>
+                  <h3>
+                    Book 2 nights, get the 3rd night free
+                  </h3>
+                </div>
+
+                <strong>
+                  {firstRewardRemaining === 0
+                    ? 'Unlocked'
+                    : `${firstRewardRemaining.toLocaleString(
+                        'en-US',
+                      )} to go`}
+                </strong>
+              </header>
 
               <p>
-                Book two nights and enjoy your third
-                night free. Redeem 1,400 points.
+                Redeem 1,400 points after booking two
+                qualifying nights.
               </p>
 
-              <div className="profile-reward-meter">
+              <div
+                className="profile-reward-meter"
+                role="progressbar"
+                aria-label="Progress toward the 1,400-point reward"
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={firstRewardProgress}
+              >
                 <span
                   style={{
                     width: `${firstRewardProgress}%`,
                   }}
                 />
-              </div>
 
-              <footer>
-                <span>
-                  {currentPoints.toLocaleString('en-US')}{' '}
-                  earned
-                </span>
-
-                <strong>
-                  {Math.max(
-                    FIRST_REWARD_POINTS -
-                      currentPoints,
-                    0,
-                  ).toLocaleString('en-US')}{' '}
-                  remaining
-                </strong>
-              </footer>
-            </article>
-
-            <article>
-              <div>
-                <span>2,800-Point Reward</span>
-                <strong>{secondRewardProgress}%</strong>
-              </div>
-
-              <h3>
-                Book 1 Night, Get the 2nd Night FREE
-              </h3>
-
-              <p>
-                Book one night and enjoy your second
-                night free. Redeem 2,800 points.
-              </p>
-
-              <div className="profile-reward-meter">
-                <span
+                <i
+                  aria-hidden="true"
                   style={{
-                    width: `${secondRewardProgress}%`,
+                    left: `${firstRewardProgress}%`,
                   }}
                 />
               </div>
@@ -481,16 +467,69 @@ function ProfilePage() {
               <footer>
                 <span>
                   {currentPoints.toLocaleString('en-US')}{' '}
-                  earned
+                  points
                 </span>
 
                 <strong>
-                  {Math.max(
-                    SECOND_REWARD_POINTS -
-                      currentPoints,
-                    0,
-                  ).toLocaleString('en-US')}{' '}
-                  remaining
+                  {firstRewardProgress}% complete
+                </strong>
+              </footer>
+            </article>
+
+            <article>
+              <header>
+                <div>
+                  <span>2,800 points</span>
+
+                  <h3>
+                    Book 1 night, get the 2nd night free
+                  </h3>
+                </div>
+
+                <strong>
+                  {secondRewardRemaining === 0
+                    ? 'Unlocked'
+                    : `${secondRewardRemaining.toLocaleString(
+                        'en-US',
+                      )} to go`}
+                </strong>
+              </header>
+
+              <p>
+                Redeem 2,800 points after booking one
+                qualifying night.
+              </p>
+
+              <div
+                className="profile-reward-meter"
+                role="progressbar"
+                aria-label="Progress toward the 2,800-point reward"
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={secondRewardProgress}
+              >
+                <span
+                  style={{
+                    width: `${secondRewardProgress}%`,
+                  }}
+                />
+
+                <i
+                  aria-hidden="true"
+                  style={{
+                    left: `${secondRewardProgress}%`,
+                  }}
+                />
+              </div>
+
+              <footer>
+                <span>
+                  {currentPoints.toLocaleString('en-US')}{' '}
+                  points
+                </span>
+
+                <strong>
+                  {secondRewardProgress}% complete
                 </strong>
               </footer>
             </article>

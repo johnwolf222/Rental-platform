@@ -6,7 +6,6 @@ import {
 import { Link } from 'react-router'
 import PlatformPage from '../components/layout/PlatformPage'
 import { useAuth } from '../context/AuthContext'
-import { properties } from '../data/properties'
 import {
   ensureMemberNotificationSeed,
   getNotificationsForMember,
@@ -36,7 +35,7 @@ const filters: Array<{
 }> = [
   {
     id: 'all',
-    label: 'All updates',
+    label: 'All',
   },
   {
     id: 'booking',
@@ -52,7 +51,7 @@ const filters: Array<{
   },
   {
     id: 'deal',
-    label: 'Deals & properties',
+    label: 'Deals',
   },
   {
     id: 'message',
@@ -291,52 +290,35 @@ function NotificationsPage() {
     )
   }
 
-  const heroProperty =
-    properties[2] ??
-    properties[0]
-
   return (
     <PlatformPage
       memberNavigation
-      heroImage={heroProperty?.image}
-      eyebrow="Live member activity"
+      compact
+      eyebrow="Member activity"
       title="Notifications"
-      description="Booking confirmations, stay access, new properties, deals, reward transactions, and manager messages appear here as they happen."
+      description="Booking, stay, reward, property, deal, and manager updates in one clear timeline."
     >
       <section
         className="notifications-center"
         aria-label="Member notification center"
       >
-        <article className="notifications-summary">
+        <header className="notifications-toolbar">
           <div>
-            <span>Private activity feed</span>
+            <span>Activity center</span>
 
-            <h2>
-              Stay informed.
-              <strong>
-                Without the clutter.
-              </strong>
-            </h2>
+            <h2>Latest updates</h2>
 
             <p>
-              Every notification is connected to
-              the reservation, property, reward
-              account, deal, or conversation that
-              created it.
+              Open an update to go directly to the
+              related stay, property, reward, or
+              conversation.
             </p>
           </div>
 
-          <aside>
-            <span>
-              <small>Unread</small>
+          <div className="notifications-toolbar__actions">
+            <span className="notifications-unread-count">
               <strong>{unreadCount}</strong>
-            </span>
-
-            <span>
-              <small>Total activity</small>
-              <strong>
-                {notifications.length}
-              </strong>
+              <small>Unread</small>
             </span>
 
             <button
@@ -344,41 +326,34 @@ function NotificationsPage() {
               disabled={unreadCount === 0}
               onClick={handleMarkAllRead}
             >
-              Mark all as read
+              Mark all read
             </button>
-          </aside>
-        </article>
+          </div>
+        </header>
+
+        <nav
+          className="notifications-filters"
+          aria-label="Notification filters"
+        >
+          {filters.map((filter) => (
+            <button
+              type="button"
+              className={
+                activeFilter === filter.id
+                  ? 'is-active'
+                  : undefined
+              }
+              onClick={() =>
+                setActiveFilter(filter.id)
+              }
+              key={filter.id}
+            >
+              {filter.label}
+            </button>
+          ))}
+        </nav>
 
         <section className="notifications-feed">
-          <header className="notifications-feed__header">
-            <div>
-              <span>Latest account updates</span>
-              <h2>Your activity timeline.</h2>
-            </div>
-
-            <nav
-              className="notifications-filters"
-              aria-label="Notification filters"
-            >
-              {filters.map((filter) => (
-                <button
-                  type="button"
-                  className={
-                    activeFilter === filter.id
-                      ? 'is-active'
-                      : undefined
-                  }
-                  onClick={() =>
-                    setActiveFilter(filter.id)
-                  }
-                  key={filter.id}
-                >
-                  {filter.label}
-                </button>
-              ))}
-            </nav>
-          </header>
-
           {filteredNotifications.length > 0 ? (
             <div className="notifications-list">
               {filteredNotifications.map(
@@ -446,13 +421,12 @@ function NotificationsPage() {
                       </div>
 
                       <span className="notification-entry__action">
-                        {isUnread && <i />}
+                        {isUnread && (
+                          <i aria-label="Unread" />
+                        )}
 
-                        <strong>
-                          Open
-                          <span aria-hidden="true">
-                            →
-                          </span>
+                        <strong aria-hidden="true">
+                          →
                         </strong>
                       </span>
                     </Link>
@@ -462,16 +436,12 @@ function NotificationsPage() {
             </div>
           ) : (
             <div className="notifications-empty">
-              <span>No updates in this category</span>
+              <span>All caught up</span>
 
-              <h3>
-                Everything is caught up.
-              </h3>
+              <h3>No updates here.</h3>
 
               <p>
-                New booking, reward, property,
-                deal, stay, and manager-message
-                updates will appear automatically.
+                New activity will appear automatically.
               </p>
             </div>
           )}
