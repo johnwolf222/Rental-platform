@@ -313,7 +313,10 @@ function PropertyPage() {
   const today = getTodayDateValue()
 
   const reservations = useMemo(
-    () => getReservations(),
+    () => {
+      void availabilityVersion
+      return getReservations()
+    },
     [availabilityVersion],
   )
 

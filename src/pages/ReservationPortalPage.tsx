@@ -13,7 +13,10 @@ import { useAuth } from '../context/AuthContext'
 import { getPropertyById } from '../data/properties'
 import {
   getReservationById,
+  RESERVATIONS_UPDATED_EVENT,
 } from '../lib/reservations'
+import ReservationStatusBadge from '../components/reservations/ReservationStatusBadge'
+import ReservationTimeline from '../components/reservations/ReservationTimeline'
 import {
   getStayPortalSettings,
   STAY_PORTAL_UPDATED_EVENT,
@@ -25,6 +28,7 @@ import {
   STAY_CHAT_UPDATED_EVENT,
   type StayChatMessage,
 } from '../lib/stayChat'
+import '../components/reservations/ReservationManagement.css'
 import './ReservationPortalExperience.css'
 
 type StayPhase =
@@ -251,12 +255,53 @@ function ReservationPortalPage() {
     }
   }, [])
 
+  const [
+    reservationVersion,
+    setReservationVersion,
+  ] = useState(0)
+
+  useEffect(() => {
+    const refreshReservation = () =>
+      setReservationVersion(
+        (currentVersion) =>
+          currentVersion + 1,
+      )
+
+    window.addEventListener(
+      RESERVATIONS_UPDATED_EVENT,
+      refreshReservation,
+    )
+
+    window.addEventListener(
+      'storage',
+      refreshReservation,
+    )
+
+    return () => {
+      window.removeEventListener(
+        RESERVATIONS_UPDATED_EVENT,
+        refreshReservation,
+      )
+
+      window.removeEventListener(
+        'storage',
+        refreshReservation,
+      )
+    }
+  }, [])
+
   const reservation = useMemo(
-    () =>
-      getReservationById(
+    () => {
+      void reservationVersion
+
+      return getReservationById(
         reservationId,
-      ),
-    [reservationId],
+      )
+    },
+    [
+      reservationId,
+      reservationVersion,
+    ],
   )
 
   const property = useMemo(
@@ -499,6 +544,58 @@ function ReservationPortalPage() {
     )
   }
 
+  if (
+    reservation.reservationStatus ===
+    'cancelled'
+  ) {
+    return (
+      <PlatformPage
+        memberNavigation
+        heroImage={property.image}
+        eyebrow="Reservation closed"
+        title="Reservation Cancelled"
+        description="This stay has been cancelled. Its status and refund activity remain available for your records."
+        backLabel="Return to My Stays"
+        backTo="/stays"
+      >
+        <section className="reservation-closed-panel">
+          <ReservationStatusBadge
+            reservation={reservation}
+            showRefund
+          />
+
+          <h2>
+            This stay is no longer active.
+          </h2>
+
+          <p>
+            {reservation.managerDecisionNote ||
+              'Management has closed this reservation. Review the timeline below for cancellation and refund updates.'}
+          </p>
+
+          <details
+            className="reservation-history-details"
+            open
+          >
+            <summary>
+              Reservation history
+            </summary>
+
+            <ReservationTimeline
+              events={
+                reservation.statusHistory
+              }
+            />
+          </details>
+
+          <Link to="/stays">
+            Return to My Stays
+          </Link>
+        </section>
+      </PlatformPage>
+    )
+  }
+
   const arrivalTimestamp =
     getZonedTimestamp(
       reservation.checkIn,
@@ -605,6 +702,35 @@ function ReservationPortalPage() {
       <section
         className={`reservation-portal reservation-portal--${phase}`}
       >
+        {reservation.reservationStatus ===
+          'cancellation-requested' && (
+          <article className="reservation-request-notice">
+            <ReservationStatusBadge
+              reservation={reservation}
+              showRefund
+            />
+
+            <p>
+              Management is reviewing your
+              cancellation request. The reservation
+              and its dates remain active until a
+              decision is recorded.
+            </p>
+
+            <details className="reservation-history-details">
+              <summary>
+                View request history
+              </summary>
+
+              <ReservationTimeline
+                events={
+                  reservation.statusHistory
+                }
+              />
+            </details>
+          </article>
+        )}
+
         <article className="reservation-portal__hero">
           <img
             src={property.image}

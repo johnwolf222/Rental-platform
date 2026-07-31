@@ -23,8 +23,18 @@ import {
 } from '../data/properties'
 import {
   getReservations,
+  RESERVATIONS_UPDATED_EVENT,
   type ReservationRecord,
+  type ReservationRefundStatus,
 } from '../lib/reservations'
+import {
+  approveReservationCancellation,
+  cancelReservationByManager,
+  rejectReservationCancellation,
+  updateReservationRefundStatus,
+} from '../lib/reservationManagement'
+import ReservationStatusBadge from '../components/reservations/ReservationStatusBadge'
+import ReservationTimeline from '../components/reservations/ReservationTimeline'
 import {
   getStayPortalSettings,
   saveStayPortalSettings,
@@ -37,6 +47,7 @@ import {
   type StayChatMessage,
 } from '../lib/stayChat'
 import '../components/booking/BookingAvailability.css'
+import '../components/reservations/ReservationManagement.css'
 import './ManagerStayExperience.css'
 
 const dateFormatter =
@@ -56,10 +67,48 @@ function formatDate(dateValue: string) {
 }
 
 function ManagerDashboardPage() {
+  const [
+    reservationVersion,
+    setReservationVersion,
+  ] = useState(0)
+
+  useEffect(() => {
+    const refreshReservations = () =>
+      setReservationVersion(
+        (currentVersion) =>
+          currentVersion + 1,
+      )
+
+    window.addEventListener(
+      RESERVATIONS_UPDATED_EVENT,
+      refreshReservations,
+    )
+
+    window.addEventListener(
+      'storage',
+      refreshReservations,
+    )
+
+    return () => {
+      window.removeEventListener(
+        RESERVATIONS_UPDATED_EVENT,
+        refreshReservations,
+      )
+
+      window.removeEventListener(
+        'storage',
+        refreshReservations,
+      )
+    }
+  }, [])
+
   const reservations =
     useMemo(
-      () => getReservations(),
-      [],
+      () => {
+        void reservationVersion
+        return getReservations()
+      },
+      [reservationVersion],
     )
 
   const initialPropertyId =
@@ -180,9 +229,35 @@ function ManagerDashboardPage() {
   const [availabilityVersion, setAvailabilityVersion] =
     useState(0)
 
+  const [
+    reservationActionStatus,
+    setReservationActionStatus,
+  ] = useState('')
+
+  const [
+    managerDecisionNote,
+    setManagerDecisionNote,
+  ] = useState('')
+
+  const [
+    selectedRefundStatus,
+    setSelectedRefundStatus,
+  ] =
+    useState<ReservationRefundStatus>(
+      'review-required',
+    )
+
   const managerDateBlocks = useMemo(
-    () => getManagerDateBlocks(selectedPropertyId),
-    [selectedPropertyId, availabilityVersion],
+    () => {
+      void availabilityVersion
+      return getManagerDateBlocks(
+        selectedPropertyId,
+      )
+    },
+    [
+      availabilityVersion,
+      selectedPropertyId,
+    ],
   )
 
   useEffect(() => {
@@ -544,6 +619,140 @@ function ManagerDashboardPage() {
     )
   }
 
+  const handleApproveCancellation = () => {
+    if (!selectedReservation) {
+      setReservationActionStatus(
+        'Select a reservation first.',
+      )
+      return
+    }
+
+    if (
+      !window.confirm(
+        'Approve this cancellation and release the dates?',
+      )
+    ) {
+      return
+    }
+
+    try {
+      approveReservationCancellation({
+        reservationId:
+          selectedReservation.id,
+        managerNote:
+          managerDecisionNote,
+      })
+
+      setReservationActionStatus(
+        'Cancellation approved. The dates are available again.',
+      )
+      setManagerDecisionNote('')
+    } catch (error) {
+      setReservationActionStatus(
+        error instanceof Error
+          ? error.message
+          : 'The cancellation could not be approved.',
+      )
+    }
+  }
+
+  const handleRejectCancellation = () => {
+    if (!selectedReservation) {
+      setReservationActionStatus(
+        'Select a reservation first.',
+      )
+      return
+    }
+
+    try {
+      rejectReservationCancellation({
+        reservationId:
+          selectedReservation.id,
+        managerNote:
+          managerDecisionNote,
+      })
+
+      setReservationActionStatus(
+        'Cancellation request declined. The reservation remains confirmed.',
+      )
+      setManagerDecisionNote('')
+    } catch (error) {
+      setReservationActionStatus(
+        error instanceof Error
+          ? error.message
+          : 'The cancellation request could not be declined.',
+      )
+    }
+  }
+
+  const handleManagerCancellation = () => {
+    if (!selectedReservation) {
+      setReservationActionStatus(
+        'Select a reservation first.',
+      )
+      return
+    }
+
+    if (
+      !window.confirm(
+        'Cancel this reservation and release the dates?',
+      )
+    ) {
+      return
+    }
+
+    try {
+      cancelReservationByManager({
+        reservationId:
+          selectedReservation.id,
+        managerNote:
+          managerDecisionNote,
+      })
+
+      setReservationActionStatus(
+        'Reservation cancelled. The dates are available again.',
+      )
+      setManagerDecisionNote('')
+    } catch (error) {
+      setReservationActionStatus(
+        error instanceof Error
+          ? error.message
+          : 'The reservation could not be cancelled.',
+      )
+    }
+  }
+
+  const handleRefundStatusUpdate = () => {
+    if (!selectedReservation) {
+      setReservationActionStatus(
+        'Select a reservation first.',
+      )
+      return
+    }
+
+    try {
+      updateReservationRefundStatus({
+        reservationId:
+          selectedReservation.id,
+        refundStatus:
+          selectedRefundStatus,
+        managerNote:
+          managerDecisionNote,
+      })
+
+      setReservationActionStatus(
+        'Refund status updated.',
+      )
+      setManagerDecisionNote('')
+    } catch (error) {
+      setReservationActionStatus(
+        error instanceof Error
+          ? error.message
+          : 'The refund status could not be updated.',
+      )
+    }
+  }
+
   const selectedMemberBalance =
     selectedReservation
       ? getRewardBalance(
@@ -556,7 +765,7 @@ function ManagerDashboardPage() {
       heroImage={selectedProperty?.image}
       eyebrow="Manager stay operations"
       title="Manager Dashboard"
-      description="Configure member arrival portals, publish protected stay information, update reminders, and communicate privately with confirmed guests."
+      description="Manage reservations, cancellation requests, refund status, arrival portals, availability, rewards, and private member communication."
       backLabel="Return to rentals"
       backTo="/"
     >
@@ -622,7 +831,7 @@ function ManagerDashboardPage() {
           <aside>
             <span>
               <small>
-                Confirmed reservations
+                Total reservations
               </small>
 
               <strong>
@@ -754,6 +963,274 @@ function ManagerDashboardPage() {
               </p>
             )}
           </div>
+        </section>
+
+        <section
+          className="manager-reservation-management"
+          aria-label="Reservation management controls"
+        >
+          <header className="manager-reservation-management__header">
+            <div>
+              <span>Reservation management</span>
+              <h2>
+                Review changes and cancellations.
+              </h2>
+            </div>
+
+            <p>
+              Cancellation requests keep dates blocked
+              until management records a decision.
+              Cancelled reservations release dates
+              automatically.
+            </p>
+          </header>
+
+          <div className="manager-reservation-selector">
+            <label>
+              <span>
+                Reservation for this property
+              </span>
+
+              <select
+                value={selectedReservationId}
+                onChange={(event) => {
+                  setSelectedReservationId(
+                    event.target.value,
+                  )
+                  setReservationActionStatus('')
+                  setManagerDecisionNote('')
+                }}
+              >
+                <option value="">
+                  Select a reservation
+                </option>
+
+                {reservationsForProperty.map(
+                  (reservation) => (
+                    <option
+                      value={reservation.id}
+                      key={reservation.id}
+                    >
+                      {reservation.propertyTitle} —{' '}
+                      {formatDate(
+                        reservation.checkIn,
+                      )}{' '}
+                      —{' '}
+                      {reservation.reservationStatus}
+                    </option>
+                  ),
+                )}
+              </select>
+            </label>
+
+            {selectedReservation && (
+              <ReservationStatusBadge
+                reservation={
+                  selectedReservation
+                }
+                showRefund
+              />
+            )}
+          </div>
+
+          {selectedReservation ? (
+            <article className="manager-reservation-summary">
+              <div className="manager-reservation-summary__facts">
+                <span>
+                  <small>Member</small>
+                  <strong>
+                    {selectedReservation.memberId}
+                  </strong>
+                </span>
+
+                <span>
+                  <small>Arrival</small>
+                  <strong>
+                    {formatDate(
+                      selectedReservation.checkIn,
+                    )}
+                  </strong>
+                </span>
+
+                <span>
+                  <small>Departure</small>
+                  <strong>
+                    {formatDate(
+                      selectedReservation.checkOut,
+                    )}
+                  </strong>
+                </span>
+
+                <span>
+                  <small>Confirmation</small>
+                  <strong>
+                    {selectedReservation.id}
+                  </strong>
+                </span>
+              </div>
+
+              <div className="manager-reservation-review">
+                <details
+                  className="reservation-history-details"
+                  open={
+                    selectedReservation
+                      .reservationStatus ===
+                    'cancellation-requested'
+                  }
+                >
+                  <summary>
+                    Reservation history
+                  </summary>
+
+                  <ReservationTimeline
+                    events={
+                      selectedReservation.statusHistory
+                    }
+                  />
+                </details>
+
+                <div className="manager-reservation-decision">
+                  {selectedReservation
+                    .cancellationReason && (
+                    <p>
+                      <strong>
+                        Member request:
+                      </strong>{' '}
+                      {
+                        selectedReservation
+                          .cancellationReason
+                      }
+                    </p>
+                  )}
+
+                  <label>
+                    <span>
+                      Management note
+                    </span>
+
+                    <textarea
+                      value={managerDecisionNote}
+                      onChange={(event) =>
+                        setManagerDecisionNote(
+                          event.target.value,
+                        )
+                      }
+                      rows={4}
+                      placeholder="Add a clear decision or refund note."
+                    />
+                  </label>
+
+                  {selectedReservation
+                    .reservationStatus ===
+                    'cancelled' && (
+                    <label>
+                      <span>
+                        Refund status
+                      </span>
+
+                      <select
+                        value={
+                          selectedRefundStatus
+                        }
+                        onChange={(event) =>
+                          setSelectedRefundStatus(
+                            event.target
+                              .value as ReservationRefundStatus,
+                          )
+                        }
+                      >
+                        <option value="review-required">
+                          Review required
+                        </option>
+                        <option value="pending">
+                          Refund pending
+                        </option>
+                        <option value="partial">
+                          Partial refund
+                        </option>
+                        <option value="full">
+                          Full refund approved
+                        </option>
+                        <option value="not-refundable">
+                          Nonrefundable
+                        </option>
+                        <option value="completed">
+                          Refund completed
+                        </option>
+                      </select>
+                    </label>
+                  )}
+
+                  <div className="manager-reservation-actions">
+                    {selectedReservation
+                      .reservationStatus ===
+                      'cancellation-requested' && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={
+                            handleApproveCancellation
+                          }
+                        >
+                          Approve cancellation
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={
+                            handleRejectCancellation
+                          }
+                        >
+                          Keep reservation
+                        </button>
+                      </>
+                    )}
+
+                    {selectedReservation
+                      .reservationStatus ===
+                      'confirmed' && (
+                      <button
+                        type="button"
+                        className="is-danger"
+                        onClick={
+                          handleManagerCancellation
+                        }
+                      >
+                        Cancel reservation
+                      </button>
+                    )}
+
+                    {selectedReservation
+                      .reservationStatus ===
+                      'cancelled' && (
+                      <button
+                        type="button"
+                        onClick={
+                          handleRefundStatusUpdate
+                        }
+                      >
+                        Save refund status
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {reservationActionStatus && (
+                <p
+                  className="manager-reservation-message"
+                  role="status"
+                >
+                  {reservationActionStatus}
+                </p>
+              )}
+            </article>
+          ) : (
+            <p className="manager-reservation-message">
+              No reservation is selected for this
+              property.
+            </p>
+          )}
         </section>
 
         <div className="manager-stay-grid">

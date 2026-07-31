@@ -282,7 +282,10 @@ function BookingReviewPage() {
   const today = getTodayDateValue()
 
   const reservations = useMemo(
-    () => getReservations(),
+    () => {
+      void availabilityVersion
+      return getReservations()
+    },
     [availabilityVersion],
   )
 

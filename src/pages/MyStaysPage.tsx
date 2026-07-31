@@ -1,9 +1,13 @@
 import {
   useEffect,
   useMemo,
+  useState,
+  type FormEvent,
 } from 'react'
 import { Link } from 'react-router'
 import PlatformPage from '../components/layout/PlatformPage'
+import ReservationStatusBadge from '../components/reservations/ReservationStatusBadge'
+import ReservationTimeline from '../components/reservations/ReservationTimeline'
 import { useAuth } from '../context/AuthContext'
 import {
   getPropertyById,
@@ -13,15 +17,23 @@ import {
   createNotification,
 } from '../lib/notifications'
 import {
+  canMemberRequestCancellation,
+  requestReservationCancellation,
+} from '../lib/reservationManagement'
+import {
   getReservationsForMember,
+  RESERVATIONS_UPDATED_EVENT,
   type ReservationRecord,
 } from '../lib/reservations'
+import '../components/reservations/ReservationManagement.css'
 import './MyStaysExperience.css'
 
 type StayPhase =
   | 'upcoming'
   | 'active'
   | 'complete'
+  | 'cancellation-requested'
+  | 'cancelled'
 
 const dateFormatter =
   new Intl.DateTimeFormat(
@@ -52,6 +64,20 @@ function formatDate(dateValue: string) {
 function getStayPhase(
   reservation: ReservationRecord,
 ): StayPhase {
+  if (
+    reservation.reservationStatus ===
+    'cancelled'
+  ) {
+    return 'cancelled'
+  }
+
+  if (
+    reservation.reservationStatus ===
+    'cancellation-requested'
+  ) {
+    return 'cancellation-requested'
+  }
+
   const currentTime = Date.now()
 
   const arrivalTime =
@@ -99,6 +125,17 @@ function phaseLabel(
   phase: StayPhase,
   reservation: ReservationRecord,
 ) {
+  if (
+    phase ===
+    'cancellation-requested'
+  ) {
+    return 'Cancellation under review'
+  }
+
+  if (phase === 'cancelled') {
+    return 'Reservation cancelled'
+  }
+
   if (phase === 'active') {
     return 'Stay active'
   }
@@ -124,9 +161,61 @@ function phaseLabel(
 function MyStaysPage() {
   const { user } = useAuth()
 
+  const [
+    reservationVersion,
+    setReservationVersion,
+  ] = useState(0)
+
+  const [
+    cancellationReservationId,
+    setCancellationReservationId,
+  ] = useState('')
+
+  const [
+    cancellationReason,
+    setCancellationReason,
+  ] = useState('')
+
+  const [
+    cancellationMessage,
+    setCancellationMessage,
+  ] = useState('')
+
+  useEffect(() => {
+    const refreshReservations = () =>
+      setReservationVersion(
+        (currentVersion) =>
+          currentVersion + 1,
+      )
+
+    window.addEventListener(
+      RESERVATIONS_UPDATED_EVENT,
+      refreshReservations,
+    )
+
+    window.addEventListener(
+      'storage',
+      refreshReservations,
+    )
+
+    return () => {
+      window.removeEventListener(
+        RESERVATIONS_UPDATED_EVENT,
+        refreshReservations,
+      )
+
+      window.removeEventListener(
+        'storage',
+        refreshReservations,
+      )
+    }
+  }, [])
+
   const reservations = useMemo(
-    () =>
-      user
+    () => {
+      void reservationVersion
+
+      return user
         ? getReservationsForMember(
             user.id,
           ).sort(
@@ -138,8 +227,12 @@ function MyStaysPage() {
                 first.checkIn,
               ).getTime(),
           )
-        : [],
-    [user],
+        : []
+    },
+    [
+      reservationVersion,
+      user,
+    ],
   )
 
   const reservationProperties =
@@ -165,8 +258,10 @@ function MyStaysPage() {
     reservations.forEach(
       (reservation) => {
         if (
+          reservation.reservationStatus !==
+            'confirmed' ||
           getStayPhase(reservation) !==
-          'active'
+            'active'
         ) {
           return
         }
@@ -214,13 +309,47 @@ function MyStaysPage() {
         'complete',
     ).length
 
+  const cancelledCount =
+    reservations.filter(
+      (reservation) =>
+        getStayPhase(reservation) ===
+        'cancelled',
+    ).length
+
+  const handleCancellationRequest = (
+    event: FormEvent<HTMLFormElement>,
+    reservation: ReservationRecord,
+  ) => {
+    event.preventDefault()
+
+    try {
+      requestReservationCancellation({
+        reservationId: reservation.id,
+        memberId: user.id,
+        reason: cancellationReason,
+      })
+
+      setCancellationMessage(
+        'Cancellation request sent to management.',
+      )
+      setCancellationReservationId('')
+      setCancellationReason('')
+    } catch (error) {
+      setCancellationMessage(
+        error instanceof Error
+          ? error.message
+          : 'The cancellation request could not be sent.',
+      )
+    }
+  }
+
   return (
     <PlatformPage
       memberNavigation
       heroImage={heroProperty?.image}
       eyebrow="Private reservation library"
       title="My Stays"
-      description="Reopen every upcoming Welcome Home countdown, active arrival portal, and completed reservation from one place."
+      description="Review upcoming stays, active arrival access, completed reservations, cancellation requests, and refund updates."
       backLabel="Return to rentals"
       backTo="/"
     >
@@ -250,10 +379,10 @@ function MyStaysPage() {
             </h2>
 
             <p>
-              Reservation confirmations, arrival
-              countdowns, property chats, directions,
-              reward details, and completed stays
-              remain connected to your account.
+              Confirmations, arrival countdowns,
+              manager decisions, refund updates,
+              and completed stays remain connected
+              to your account.
             </p>
 
             <Link to="/">
@@ -277,14 +406,28 @@ function MyStaysPage() {
               <small>Completed</small>
               <strong>{completedCount}</strong>
             </span>
+
+            <span>
+              <small>Cancelled</small>
+              <strong>{cancelledCount}</strong>
+            </span>
           </aside>
         </article>
+
+        {cancellationMessage && (
+          <p
+            className="reservation-action-message"
+            role="status"
+          >
+            {cancellationMessage}
+          </p>
+        )}
 
         {reservations.length > 0 ? (
           <section className="my-stays-list">
             <header className="my-stays-heading">
               <div>
-                <span>Confirmed reservations</span>
+                <span>Reservation history</span>
                 <h2>Your homes away from home.</h2>
               </div>
 
@@ -306,6 +449,11 @@ function MyStaysPage() {
 
                   const phase =
                     getStayPhase(
+                      reservation,
+                    )
+
+                  const canCancel =
+                    canMemberRequestCancellation(
                       reservation,
                     )
 
@@ -336,7 +484,7 @@ function MyStaysPage() {
                           <small>
                             {property
                               ? `${property.city}, ${property.state}`
-                              : 'Confirmed property'}
+                              : 'Reserved property'}
                           </small>
 
                           <h3>
@@ -346,6 +494,13 @@ function MyStaysPage() {
                       </div>
 
                       <div className="my-stay-card__content">
+                        <div className="reservation-card-status-row">
+                          <ReservationStatusBadge
+                            reservation={reservation}
+                            showRefund
+                          />
+                        </div>
+
                         <div className="my-stay-card__dates">
                           <span>
                             <small>Arrival</small>
@@ -392,6 +547,101 @@ function MyStaysPage() {
                           </span>
                         </div>
 
+                        {reservation.reservationStatus ===
+                          'cancellation-requested' && (
+                          <div className="reservation-request-note">
+                            <strong>
+                              Management review pending
+                            </strong>
+
+                            <p>
+                              {reservation.cancellationReason}
+                            </p>
+                          </div>
+                        )}
+
+                        {canCancel && (
+                          <div className="reservation-cancellation-panel">
+                            {cancellationReservationId ===
+                            reservation.id ? (
+                              <form
+                                onSubmit={(event) =>
+                                  handleCancellationRequest(
+                                    event,
+                                    reservation,
+                                  )
+                                }
+                              >
+                                <label>
+                                  <span>
+                                    Reason for cancellation
+                                  </span>
+
+                                  <textarea
+                                    value={cancellationReason}
+                                    onChange={(event) =>
+                                      setCancellationReason(
+                                        event.target.value,
+                                      )
+                                    }
+                                    rows={3}
+                                    placeholder="Briefly explain why you need to cancel."
+                                    required
+                                  />
+                                </label>
+
+                                <div>
+                                  <button
+                                    type="submit"
+                                  >
+                                    Send request
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setCancellationReservationId(
+                                        '',
+                                      )
+                                      setCancellationReason(
+                                        '',
+                                      )
+                                    }}
+                                  >
+                                    Keep reservation
+                                  </button>
+                                </div>
+                              </form>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setCancellationReservationId(
+                                    reservation.id,
+                                  )
+                                  setCancellationMessage(
+                                    '',
+                                  )
+                                }}
+                              >
+                                Request cancellation
+                              </button>
+                            )}
+                          </div>
+                        )}
+
+                        <details className="reservation-history-details">
+                          <summary>
+                            Reservation history
+                          </summary>
+
+                          <ReservationTimeline
+                            events={
+                              reservation.statusHistory
+                            }
+                          />
+                        </details>
+
                         <footer>
                           <div>
                             <small>
@@ -410,19 +660,29 @@ function MyStaysPage() {
                             </span>
                           </div>
 
-                          <Link
-                            to={`/stays/${reservation.id}`}
-                          >
-                            {phase === 'upcoming'
-                              ? 'Open Welcome Home'
-                              : phase === 'active'
-                                ? 'Enjoy Your Stay'
-                                : 'View completed stay'}
-
-                            <span aria-hidden="true">
-                              →
+                          {reservation.reservationStatus ===
+                          'cancelled' ? (
+                            <span className="reservation-closed-label">
+                              Reservation closed
                             </span>
-                          </Link>
+                          ) : (
+                            <Link
+                              to={`/stays/${reservation.id}`}
+                            >
+                              {phase === 'upcoming'
+                                ? 'Open Welcome Home'
+                                : phase === 'active'
+                                  ? 'Enjoy Your Stay'
+                                  : phase ===
+                                      'cancellation-requested'
+                                    ? 'Review stay'
+                                    : 'View completed stay'}
+
+                              <span aria-hidden="true">
+                                →
+                              </span>
+                            </Link>
+                          )}
                         </footer>
                       </div>
                     </article>
@@ -433,7 +693,7 @@ function MyStaysPage() {
           </section>
         ) : (
           <section className="my-stays-empty">
-            <span>No confirmed stays yet</span>
+            <span>No reservations yet</span>
 
             <h2>
               Your reservation collection begins here.

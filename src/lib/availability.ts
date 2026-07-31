@@ -4,7 +4,7 @@ export type AvailabilityReservation = {
   propertyTitle: string
   checkIn: string
   checkOut: string
-  reservationStatus: 'confirmed'
+  reservationStatus: string
 }
 
 export type ManagerDateBlock = {
@@ -170,7 +170,12 @@ export function getPropertyUnavailableRanges(
     .filter(
       (reservation) =>
         reservation.propertyId === propertyId &&
-        reservation.reservationStatus === 'confirmed',
+        (
+          reservation.reservationStatus ===
+            'confirmed' ||
+          reservation.reservationStatus ===
+            'cancellation-requested'
+        ),
     )
     .map(
       (reservation): UnavailableDateRange => ({
