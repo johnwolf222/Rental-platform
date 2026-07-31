@@ -14,6 +14,7 @@ if (!rootElement) {
 }
 
 import './ProfessionalUI.css'
+import './ActualUIUpgrade.css'
 createRoot(rootElement).render(
   <StrictMode>
     <BrowserRouter>
