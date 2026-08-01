@@ -2000,3 +2000,377 @@
   }
 }
 
+
+/* =========================================================
+   LIGHT EDITORIAL HOMEPAGE SECTIONS V1
+   Removes the oversized dark-green section slabs while
+   preserving the custom header, banner, rewards, and hero.
+   ========================================================= */
+
+.app-shell .quick-search {
+  position: relative;
+  width: min(calc(100% - 40px), 1360px);
+  margin-top: 106px;
+  border: 0;
+  border-top: 1px solid var(--ux3-line);
+  border-radius: 0;
+  padding: 48px 0 0;
+  overflow: visible;
+  color: var(--ux3-ink);
+  background: transparent;
+  box-shadow: none;
+}
+
+.app-shell .quick-search::before,
+.app-shell .quick-search::after {
+  display: none;
+}
+
+.app-shell .quick-search .section-heading {
+  position: relative;
+  z-index: auto;
+  grid-template-columns: minmax(0, 0.82fr) minmax(320px, 0.68fr);
+  align-items: end;
+  gap: clamp(34px, 6vw, 92px);
+  text-align: left;
+}
+
+.app-shell .quick-search .eyebrow {
+  color: var(--ux3-forest);
+}
+
+.app-shell .quick-search .section-heading h2 {
+  max-width: 620px;
+  color: var(--ux3-ink);
+  font-size: clamp(3rem, 5.3vw, 5.5rem);
+  line-height: 0.93;
+  letter-spacing: -0.065em;
+}
+
+.app-shell .quick-search .section-heading p {
+  max-width: 500px;
+  margin: 0 0 7px;
+  color: var(--ux3-muted);
+  font-size: 0.9rem;
+  line-height: 1.72;
+}
+
+.app-shell .search-panel {
+  position: relative;
+  z-index: auto;
+  margin-top: 34px;
+  border: 1px solid var(--ux3-line);
+  border-radius: 18px;
+  padding: 7px;
+  display: grid;
+  grid-template-columns:
+    minmax(145px, 1.05fr)
+    minmax(145px, 1fr)
+    minmax(155px, 1fr)
+    minmax(145px, 0.95fr)
+    auto;
+  gap: 6px;
+  background: #ffffff;
+  box-shadow: 0 14px 36px rgba(16, 45, 36, 0.055);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.app-shell .search-panel label {
+  min-height: 66px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  padding: 10px 13px;
+  background: #f6f8f5;
+  transition:
+    border-color 180ms ease,
+    background 180ms ease;
+}
+
+.app-shell .search-panel label:hover,
+.app-shell .search-panel label:focus-within {
+  border-color: rgba(18, 61, 48, 0.16);
+  background: #ffffff;
+}
+
+.app-shell .search-panel label > span:first-child {
+  margin-bottom: 5px;
+  color: #77827e;
+  font-size: 0.57rem;
+  letter-spacing: 0.105em;
+}
+
+.app-shell .search-panel input,
+.app-shell .search-panel select {
+  color: var(--ux3-ink);
+  font-size: 0.76rem;
+}
+
+.app-shell .search-panel .date-field {
+  color: var(--ux3-forest);
+}
+
+.app-shell .search-button {
+  min-width: 168px;
+  min-height: 66px;
+  border-radius: 12px;
+  color: #ffffff;
+  background: var(--ux3-forest);
+  box-shadow: none;
+  transition:
+    background 180ms ease,
+    transform 180ms ease;
+}
+
+.app-shell .search-button:hover {
+  background: var(--ux3-forest-deep);
+  transform: translateY(-1px);
+}
+
+.app-shell .state-browser-heading {
+  position: relative;
+  z-index: auto;
+  margin-top: 34px;
+  color: var(--ux3-ink);
+}
+
+.app-shell .state-browser-heading > div > span {
+  color: var(--ux3-ink);
+  font-size: 1.55rem;
+}
+
+.app-shell .state-browser-heading p {
+  color: var(--ux3-muted);
+}
+
+.app-shell .state-browser-heading button {
+  border-color: var(--ux3-line);
+  color: var(--ux3-forest);
+  background: #ffffff;
+}
+
+.app-shell .state-grid {
+  position: relative;
+  z-index: auto;
+  margin-top: 17px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.app-shell .state-card {
+  min-height: 116px;
+  border: 1px solid var(--ux3-line);
+  border-radius: 16px;
+  padding: 16px;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-content: center;
+  color: var(--ux3-ink);
+  background: #ffffff;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.app-shell .state-card:hover,
+.app-shell .state-card.is-selected {
+  transform: translateY(-3px);
+  border-color: rgba(18, 61, 48, 0.27);
+  color: var(--ux3-ink);
+  background: #ffffff;
+  box-shadow: 0 12px 28px rgba(16, 45, 36, 0.07);
+}
+
+.app-shell .state-card__symbol {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  color: var(--ux3-forest);
+  background: var(--ux3-sage);
+  box-shadow: none;
+}
+
+.app-shell .state-card__copy small {
+  color: var(--ux3-gold-deep);
+}
+
+.app-shell .state-card__copy strong {
+  color: var(--ux3-ink);
+  font-size: 1.22rem;
+}
+
+.app-shell .state-card__copy > span {
+  color: var(--ux3-muted);
+}
+
+.app-shell .state-card__arrow {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--ux3-line);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: var(--ux3-forest);
+  background: #ffffff;
+}
+
+.app-shell .contact-section {
+  position: relative;
+  width: min(calc(100% - 40px), 1360px);
+  min-height: 0;
+  margin-top: 112px;
+  border: 0;
+  border-top: 1px solid var(--ux3-line);
+  border-bottom: 1px solid var(--ux3-line);
+  border-radius: 0;
+  padding: 44px 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 42px;
+  overflow: visible;
+  color: var(--ux3-ink);
+  background: transparent;
+  box-shadow: none;
+}
+
+.app-shell .contact-section::before,
+.app-shell .contact-section::after {
+  display: none;
+}
+
+.app-shell .contact-section .eyebrow {
+  color: var(--ux3-forest);
+}
+
+.app-shell .contact-section h2 {
+  max-width: 760px;
+  margin-top: 8px;
+  color: var(--ux3-ink);
+  font-family: var(--sans);
+  font-size: clamp(2rem, 3.7vw, 3.7rem);
+  font-weight: 780;
+  line-height: 0.98;
+  letter-spacing: -0.055em;
+}
+
+.app-shell .contact-section p {
+  max-width: 690px;
+  margin-top: 12px;
+  color: var(--ux3-muted);
+  font-size: 0.88rem;
+  line-height: 1.7;
+}
+
+.app-shell .contact-section button {
+  min-height: 46px;
+  border: 1px solid var(--ux3-line-strong);
+  border-radius: 12px;
+  padding: 12px 16px;
+  color: var(--ux3-forest);
+  background: #ffffff;
+  box-shadow: none;
+}
+
+.app-shell .contact-section button:hover {
+  color: #ffffff;
+  background: var(--ux3-forest);
+}
+
+@media (max-width: 1180px) {
+  .app-shell .search-panel {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .app-shell .search-button {
+    grid-column: 1 / -1;
+  }
+
+  .app-shell .state-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .app-shell .quick-search {
+    border-radius: 0;
+    padding: 40px 0 0;
+  }
+
+  .app-shell .quick-search .section-heading {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .app-shell .quick-search .section-heading p {
+    margin: 0;
+  }
+
+  .app-shell .contact-section {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .app-shell .contact-section button {
+    width: fit-content;
+  }
+}
+
+@media (max-width: 680px) {
+  .app-shell .quick-search,
+  .app-shell .contact-section {
+    width: min(calc(100% - 24px), 1360px);
+    border-radius: 0;
+  }
+
+  .app-shell .quick-search {
+    margin-top: 78px;
+    padding-top: 32px;
+  }
+
+  .app-shell .quick-search .section-heading h2 {
+    font-size: clamp(2.7rem, 13vw, 4.1rem);
+  }
+
+  .app-shell .search-panel {
+    border: 0;
+    padding: 0;
+    grid-template-columns: 1fr;
+    gap: 9px;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .app-shell .search-panel label {
+    border-color: var(--ux3-line);
+    background: #ffffff;
+  }
+
+  .app-shell .search-button {
+    grid-column: auto;
+  }
+
+  .app-shell .state-grid {
+    width: calc(100% + 12px);
+    padding: 1px 12px 12px 1px;
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .app-shell .state-grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .app-shell .state-card {
+    min-height: 108px;
+    flex: 0 0 84%;
+    scroll-snap-align: start;
+  }
+
+  .app-shell .contact-section {
+    margin-top: 82px;
+    padding: 34px 0;
+  }
+}
