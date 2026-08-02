@@ -2557,30 +2557,143 @@
 }
 
 /* =========================================================
-   FULL PROPERTY CARD IMAGES V1
-   Shows each complete homepage property image without
-   cropping while preserving the existing card layout.
+   FULL-WIDTH EDITORIAL PROPERTY CARDS V2
+   Full source images span the entire card width using their
+   natural proportions. No half-card image column, cropping,
+   or empty contain-style image space.
    ========================================================= */
 
+.app-shell .property-grid {
+  align-items: start;
+  gap: 26px;
+}
+
+.app-shell .property-card {
+  position: relative;
+  min-height: 0;
+  border: 1px solid var(--ux3-line);
+  border-radius: 28px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #ffffff;
+  box-shadow: 0 14px 38px rgba(16, 45, 36, 0.065);
+}
+
+.app-shell .property-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(18, 61, 48, 0.2);
+  box-shadow: 0 22px 48px rgba(16, 45, 36, 0.1);
+}
+
 .app-shell .property-card__image {
-  background:
-    linear-gradient(
-      145deg,
-      #f4f6f3 0%,
-      #edf1ed 100%
-    );
+  position: relative;
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  aspect-ratio: auto;
+  grid-column: auto;
+  grid-row: auto;
+  overflow: hidden;
+  background: #eef1ed;
 }
 
 .app-shell .property-card__image img {
   width: 100%;
-  height: 100%;
-  object-fit: contain;
-  object-position: center;
+  height: auto;
+  max-height: none;
+  display: block;
+  object-fit: initial;
+  object-position: initial;
   background: transparent;
 }
 
-/*
-  The thumbnails remain cropped because they are navigation
-  previews. Only the main card image is changed to show the
-  complete source image.
-*/
+.app-shell .property-card__thumbnails {
+  position: relative;
+  top: auto;
+  right: auto;
+  bottom: auto;
+  left: auto;
+  z-index: 5;
+  width: fit-content;
+  max-width: calc(100% - 36px);
+  margin: -27px 18px 0;
+  padding: 6px;
+  align-self: flex-start;
+  border: 1px solid rgba(18, 61, 48, 0.08);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 10px 26px rgba(16, 45, 36, 0.12);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.app-shell .property-card__body {
+  width: 100%;
+  grid-column: auto;
+  grid-row: auto;
+  padding: 27px 26px 20px;
+}
+
+.app-shell .property-card__heading h3 {
+  font-size: clamp(1.65rem, 2.5vw, 2.25rem);
+  line-height: 1;
+}
+
+.app-shell .property-card__pricing {
+  margin-top: 22px;
+  border-top: 1px solid var(--ux3-line);
+  padding-top: 18px;
+}
+
+.app-shell .property-card__social {
+  width: 100%;
+  margin-top: auto;
+  grid-column: auto;
+  grid-row: auto;
+}
+
+@media (max-width: 1180px) {
+  .app-shell .property-card {
+    display: flex;
+    grid-template-columns: none;
+    grid-template-rows: none;
+  }
+
+  .app-shell .property-card__image {
+    min-height: 0;
+    height: auto;
+  }
+
+  .app-shell .property-card__thumbnails {
+    top: auto;
+    bottom: auto;
+  }
+}
+
+@media (max-width: 680px) {
+  .app-shell .property-grid {
+    gap: 18px;
+  }
+
+  .app-shell .property-card {
+    border-radius: 22px;
+  }
+
+  .app-shell .property-card__image {
+    min-height: 0;
+  }
+
+  .app-shell .property-card__thumbnails {
+    top: auto;
+    margin: -24px 14px 0;
+  }
+
+  .app-shell .property-card__body {
+    padding: 24px 19px 18px;
+  }
+
+  .app-shell .property-card__heading h3 {
+    font-size: 1.7rem;
+  }
+}
