@@ -2564,6 +2564,8 @@
    ========================================================= */
 
 .app-shell .property-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   align-items: start;
   gap: 26px;
 }
@@ -2571,7 +2573,7 @@
 .app-shell .property-card {
   position: relative;
   min-height: 0;
-  border: 1px solid var(--ux3-line);
+  border: 0;
   border-radius: 28px;
   display: flex;
   flex-direction: column;
@@ -2582,30 +2584,27 @@
 
 .app-shell .property-card:hover {
   transform: translateY(-4px);
-  border-color: rgba(18, 61, 48, 0.2);
   box-shadow: 0 22px 48px rgba(16, 45, 36, 0.1);
 }
 
 .app-shell .property-card__image {
   position: relative;
   width: 100%;
+  aspect-ratio: 3 / 2;
   height: auto;
   min-height: 0;
-  aspect-ratio: auto;
-  grid-column: auto;
-  grid-row: auto;
+  margin: 0;
+  border-radius: 0;
   overflow: hidden;
   background: #eef1ed;
 }
 
 .app-shell .property-card__image img {
   width: 100%;
-  height: auto;
-  max-height: none;
+  height: 100%;
   display: block;
-  object-fit: initial;
-  object-position: initial;
-  background: transparent;
+  object-fit: cover;
+  object-position: center;
 }
 
 .app-shell .property-card__thumbnails {
@@ -2654,6 +2653,11 @@
 }
 
 @media (max-width: 1180px) {
+  .app-shell .property-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+  }
+
   .app-shell .property-card {
     display: flex;
     grid-template-columns: none;
@@ -2672,8 +2676,8 @@
 }
 
 @media (max-width: 680px) {
-  .app-shell .property-grid {
-    gap: 18px;
+    .app-shell .property-grid {
+    grid-template-columns: 1fr;
   }
 
   .app-shell .property-card {

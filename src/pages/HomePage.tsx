@@ -737,7 +737,35 @@ function HomePage() {
 
                 return (
                   <article className="property-card" key={property.id}>
-                    <div className="property-card__image">
+                    <div
+                    className="property-card__image"
+                    role="link"
+                    tabIndex={0}
+                    aria-label={`View ${property.title}`}
+                    style={{ cursor: 'pointer' }}
+                    onClick={(event) => {
+                      const target = event.target as HTMLElement
+
+                      if (target.closest('button, a')) {
+                        return
+                      }
+
+                      navigate(`/properties/${property.id}`)
+                    }}
+                    onKeyDown={(event) => {
+                      if (event.target !== event.currentTarget) {
+                        return
+                      }
+
+                      if (
+                        event.key === 'Enter' ||
+                        event.key === ' '
+                      ) {
+                        event.preventDefault()
+                        navigate(`/properties/${property.id}`)
+                      }
+                    }}
+                  >
                       <img src={property.image} alt={property.title} />
 
                       <span className="property-card__label">
